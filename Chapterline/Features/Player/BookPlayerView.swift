@@ -102,6 +102,7 @@ struct BookPlayerView: View {
                     position: isScrubbing ? scrubPosition : snap.position,
                     duration: max(snap.duration, book.duration),
                     chapters: snap.chapters.isEmpty ? book.chapterMarkers : snap.chapters,
+                    allowsScrubbing: settings.allowBookScrubbing,
                     onScrub: { value in
                         isScrubbing = true
                         scrubPosition = value
@@ -258,6 +259,7 @@ struct ChapterScrubber: View {
     var position: TimeInterval
     var duration: TimeInterval
     var chapters: [ChapterMarker]
+    var allowsScrubbing: Bool = true
     var onScrub: (TimeInterval) -> Void
     var onCommit: (TimeInterval) -> Void
 
@@ -265,7 +267,7 @@ struct ChapterScrubber: View {
         VStack(spacing: 6) {
             GeometryReader { geo in
                 let width = geo.size.width
-                ZStack(alignment: .leading) {
+                let bar = ZStack(alignment: .leading) {
                     Capsule().fill(Theme.fill).frame(height: 6)
                     Capsule()
                         .fill(Color.accentColor)
@@ -281,17 +283,12 @@ struct ChapterScrubber: View {
                 }
                 .frame(maxHeight: .infinity)
                 .contentShape(Rectangle())
-                .highPriorityGesture(
-                    DragGesture(minimumDistance: 0)
-                        .onChanged { value in
-                            let fraction = min(1, max(0, value.location.x / width))
-                            onScrub(fraction * duration)
-                        }
-                        .onEnded { value in
-                            let fraction = min(1, max(0, value.location.x / width))
-                            onCommit(fraction * duration)
-                        }
-                )
+
+                if allowsScrubbing {
+                    bar.highPriorityGesture(scrubGesture(width: width))
+                } else {
+                    bar
+                }
             }
             .frame(height: 44)
             HStack {
@@ -303,11 +300,24 @@ struct ChapterScrubber: View {
             .foregroundStyle(Theme.textSecondary)
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Playback position")
+        .accessibilityLabel(allowsScrubbing ? "Playback position" : "Playback position, scrubbing off")
         .accessibilityValue(TimeMath.format(duration: position))
         .accessibilityAdjustableAction { direction in
+            guard allowsScrubbing else { return }
             let delta: TimeInterval = direction == .increment ? 15 : -15
             onCommit(min(duration, max(0, position + delta)))
         }
+    }
+
+    private func scrubGesture(width: CGFloat) -> some Gesture {
+        DragGesture(minimumDistance: 0)
+            .onChanged { value in
+                let fraction = min(1, max(0, value.location.x / width))
+                onScrub(fraction * duration)
+            }
+            .onEnded { value in
+                let fraction = min(1, max(0, value.location.x / width))
+                onCommit(fraction * duration)
+            }
     }
 }

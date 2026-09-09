@@ -131,6 +131,14 @@ struct SettingsView: View {
             Text("For spoiler-sensitive listening. Progress percent still shows.")
                 .font(.footnote)
                 .foregroundStyle(Theme.textSecondary)
+            Toggle("Allow scrubbing", isOn: Binding(
+                get: { settings.allowBookScrubbing },
+                set: { settings.allowBookScrubbing = $0 }
+            ))
+            .accessibilityLabel("Allow scrubbing the whole book")
+            Text("Turn off to lock the progress bar. Chapter marks still show. Skip and chapter buttons still work.")
+                .font(.footnote)
+                .foregroundStyle(Theme.textSecondary)
         }
     }
 
