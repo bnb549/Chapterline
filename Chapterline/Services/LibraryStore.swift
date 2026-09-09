@@ -88,6 +88,9 @@ final class LibraryStore {
         if finished {
             book.isFinished = true
             book.position = book.duration
+            if book.finishedAt == nil {
+                book.finishedAt = Date()
+            }
         }
         save()
     }
@@ -96,6 +99,11 @@ final class LibraryStore {
         book.isFinished = finished
         if finished {
             book.position = book.duration
+            if book.finishedAt == nil {
+                book.finishedAt = Date()
+            }
+        } else {
+            book.finishedAt = nil
         }
         save()
         refresh()

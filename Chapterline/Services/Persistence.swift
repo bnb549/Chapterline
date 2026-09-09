@@ -7,7 +7,8 @@ enum Persistence {
         BookFile.self,
         Chapter.self,
         Bookmark.self,
-        Folder.self
+        Folder.self,
+        ListeningSession.self
     ])
 
     static let container: ModelContainer = {

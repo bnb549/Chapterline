@@ -19,6 +19,7 @@ struct PlayerSnapshot: Equatable, Sendable {
     var sleepFading: Bool
     var chapters: [ChapterMarker]
     var fileDurations: [TimeInterval]
+    var stopReason: SessionEndReason?
 
     static let empty = PlayerSnapshot(
         bookID: nil,
@@ -38,7 +39,8 @@ struct PlayerSnapshot: Equatable, Sendable {
         sleepEndsAt: nil,
         sleepFading: false,
         chapters: [],
-        fileDurations: []
+        fileDurations: [],
+        stopReason: nil
     )
 
     var remaining: TimeInterval {

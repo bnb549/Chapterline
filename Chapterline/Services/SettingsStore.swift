@@ -43,6 +43,9 @@ final class SettingsStore {
     var shakeToExtendSleep: Bool {
         didSet { defaults.set(shakeToExtendSleep, forKey: Key.shakeExtend) }
     }
+    var trackListeningStats: Bool {
+        didSet { defaults.set(trackListeningStats, forKey: Key.trackListeningStats) }
+    }
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
@@ -64,6 +67,7 @@ final class SettingsStore {
         libraryLayout = LibraryLayout(rawValue: defaults.string(forKey: Key.layout) ?? "grid") ?? .grid
         librarySort = LibrarySort(rawValue: defaults.string(forKey: Key.sort) ?? "recent") ?? .recent
         shakeToExtendSleep = defaults.object(forKey: Key.shakeExtend) as? Bool ?? true
+        trackListeningStats = defaults.object(forKey: Key.trackListeningStats) as? Bool ?? true
     }
 
     var preferredColorScheme: ColorScheme? {
@@ -89,5 +93,6 @@ final class SettingsStore {
         static let layout = "settings.layout"
         static let sort = "settings.sort"
         static let shakeExtend = "settings.shakeExtend"
+        static let trackListeningStats = "settings.trackListeningStats"
     }
 }

@@ -4,12 +4,15 @@ struct RootView: View {
     @Environment(SettingsStore.self) private var settings
     @Environment(LibraryStore.self) private var library
     @Environment(PlayerController.self) private var player
+    @Environment(ListeningStatsStore.self) private var stats
     @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         TabView {
             LibraryView()
                 .tabItem { Label("Library", systemImage: "books.vertical") }
+            StatsView()
+                .tabItem { Label("Stats", systemImage: "chart.bar") }
             SettingsView()
                 .tabItem { Label("Settings", systemImage: "gearshape") }
         }
@@ -37,7 +40,7 @@ struct RootView: View {
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.willTerminateNotification)) { _ in
-            player.persistNow()
+            player.closeStatsForTerminate()
         }
         .onOpenURL { url in
             handleOpenURL(url)

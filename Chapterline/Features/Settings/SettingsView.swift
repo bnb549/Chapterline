@@ -3,6 +3,8 @@ import SwiftUI
 struct SettingsView: View {
     @Environment(SettingsStore.self) private var settings
     @Environment(PlayerController.self) private var player
+    @Environment(ListeningStatsStore.self) private var stats
+    @State private var confirmDeleteStats = false
 
     var body: some View {
         NavigationStack {
@@ -12,6 +14,7 @@ struct SettingsView: View {
                     playbackSection
                     rewindSection
                     appearanceSection
+                    statsSection
                     carPlaySection
                     aboutSection
                 }
@@ -20,6 +23,18 @@ struct SettingsView: View {
             .navigationTitle("Settings")
             .toolbarBackground(settings.usesTrueBlack ? Color.black : Color.clear, for: .navigationBar)
             .toolbarBackground(settings.usesTrueBlack ? .visible : .automatic, for: .navigationBar)
+            .confirmationDialog(
+                "Delete all listening stats?",
+                isPresented: $confirmDeleteStats,
+                titleVisibility: .visible
+            ) {
+                Button("Delete All Stats", role: .destructive) {
+                    stats.deleteAll()
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("Sessions and totals on this device will be removed. Books and progress stay.")
+            }
         }
     }
 
@@ -116,6 +131,41 @@ struct SettingsView: View {
             Text("For spoiler-sensitive listening. Progress percent still shows.")
                 .font(.footnote)
                 .foregroundStyle(Theme.textSecondary)
+        }
+    }
+
+    private var statsSection: some View {
+        Section("Listening stats") {
+            Toggle("Track listening stats", isOn: Binding(
+                get: { settings.trackListeningStats },
+                set: { enabled in
+                    settings.trackListeningStats = enabled
+                    if !enabled {
+                        stats.discardOpenSession()
+                    }
+                }
+            ))
+            .accessibilityLabel("Track listening stats")
+            Text("Hours stay on this device. Seeking does not inflate time. Sessions under 15 seconds are ignored.")
+                .font(.footnote)
+                .foregroundStyle(Theme.textSecondary)
+
+            ShareLink(
+                item: stats.exportFileURL(),
+                preview: SharePreview("Chapterline Stats")
+            ) {
+                Label("Export JSON", systemImage: "square.and.arrow.up")
+                    .frame(minHeight: 44)
+            }
+            .accessibilityLabel("Export listening stats as JSON")
+            .disabled(stats.allTimeSessionCount == 0)
+
+            Button("Delete all stats", role: .destructive) {
+                confirmDeleteStats = true
+            }
+            .frame(minHeight: 44, alignment: .leading)
+            .accessibilityLabel("Delete all listening stats")
+            .disabled(stats.allTimeSessionCount == 0 && !stats.hasOpenSession)
         }
     }
 

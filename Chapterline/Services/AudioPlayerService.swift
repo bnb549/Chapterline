@@ -24,6 +24,7 @@ actor AudioPlayerService {
     private var sleepFadeSeconds: TimeInterval = 10
     private var sessionConfigured = false
     private var wasPlayingBeforeInterruption = false
+    private var lastStopReason: SessionEndReason = .unknown
 
     func configureSessionIfNeeded() {
         guard !sessionConfigured else { return }
@@ -100,7 +101,8 @@ actor AudioPlayerService {
             sleepEndsAt: sleepDeadline(at: position),
             sleepFading: sleepFading,
             chapters: chapters,
-            fileDurations: fileDurations
+            fileDurations: fileDurations,
+            stopReason: playing ? nil : lastStopReason
         )
     }
 
@@ -129,9 +131,10 @@ actor AudioPlayerService {
         }
     }
 
-    func pause() {
+    func pause(reason: SessionEndReason = .pause) {
         intendedPlaying = false
         lastPauseAt = Date()
+        lastStopReason = reason
         player.pause()
         sleepFading = false
         player.volume = volume
@@ -248,6 +251,7 @@ actor AudioPlayerService {
 
     func handleInterruptionBegan() {
         wasPlayingBeforeInterruption = intendedPlaying
+        lastStopReason = .interruption
         player.pause()
     }
 
@@ -259,7 +263,7 @@ actor AudioPlayerService {
 
     func handleRouteChange(shouldPause: Bool) {
         if shouldPause {
-            pause()
+            pause(reason: .routeChange)
         }
     }
 
@@ -314,7 +318,7 @@ actor AudioPlayerService {
         guard let deadline = sleepDeadline(at: position) else { return }
         let remaining = deadline.timeIntervalSinceNow
         if remaining <= 0 {
-            pause()
+            pause(reason: .sleepTimer)
             sleepMode = nil
             sleepFading = false
             player.volume = volume

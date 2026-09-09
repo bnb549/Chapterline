@@ -46,6 +46,7 @@ enum PreviewData {
             ]
         )
         pride.isFinished = true
+        pride.finishedAt = Date().addingTimeInterval(-86400)
 
         let leftHand = makeBook(
             title: "The Left Hand of Darkness",
@@ -65,7 +66,39 @@ enum PreviewData {
         context.insert(dune)
         context.insert(pride)
         context.insert(leftHand)
+        seedSessions(into: context, dune: dune, pride: pride, leftHand: leftHand)
         try? context.save()
+    }
+
+    private static func seedSessions(into context: ModelContext, dune: Book, pride: Book, leftHand: Book) {
+        let calendar = Calendar.current
+        let today = Date()
+        func day(_ offset: Int, hour: Int, duration: TimeInterval, book: Book, rate: Double, chapter: String) {
+            guard let started = calendar.date(byAdding: .day, value: offset, to: calendar.startOfDay(for: today)) else { return }
+            let start = calendar.date(bySettingHour: hour, minute: 12, second: 0, of: started) ?? started
+            let wall = duration
+            let session = ListeningSession(
+                bookID: book.id,
+                bookTitle: book.title,
+                author: book.author,
+                narrator: book.narrator,
+                startedAt: start,
+                endedAt: start.addingTimeInterval(wall),
+                wallDuration: wall,
+                contentDuration: ListeningStatsMath.contentDuration(wall: wall, rate: rate),
+                rate: rate,
+                startPosition: 600,
+                endPosition: 600 + wall * rate,
+                chapterTitle: chapter,
+                endReason: .pause
+            )
+            context.insert(session)
+        }
+        day(0, hour: 7, duration: 42 * 60, book: dune, rate: 1.2, chapter: "Muad'Dib")
+        day(-1, hour: 21, duration: 55 * 60, book: dune, rate: 1.2, chapter: "Book One")
+        day(-2, hour: 6, duration: 28 * 60, book: leftHand, rate: 1.6, chapter: "A Parade in Erhenrang")
+        day(-4, hour: 19, duration: 90 * 60, book: pride, rate: 1.0, chapter: "Chapter 2")
+        day(-8, hour: 8, duration: 35 * 60, book: dune, rate: 1.5, chapter: "The Prophet")
     }
 
     private static func makeBook(

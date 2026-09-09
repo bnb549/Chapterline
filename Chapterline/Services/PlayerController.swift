@@ -15,6 +15,7 @@ final class PlayerController {
     var loadedBookID: UUID?
 
     var onPersist: ((UUID, TimeInterval, Double, Bool, Bool) -> Void)?
+    var stats: ListeningStatsStore?
 
     private var pollTask: Task<Void, Never>?
     private var lastPersistAt = Date.distantPast
@@ -31,6 +32,7 @@ final class PlayerController {
                 let snap = await self.engine.snapshot()
                 self.snapshot = snap
                 self.persistIfNeeded(snap)
+                self.stats?.ingest(snap)
                 NowPlayingBridge.shared.publish(snap, artwork: self.artwork)
                 self.writeWidgetSnapshot(snap)
                 try? await Task.sleep(for: .milliseconds(250))
@@ -50,6 +52,9 @@ final class PlayerController {
     }
 
     func load(book: Book) async {
+        if let currentID = snapshot.bookID, currentID != book.id {
+            stats?.closeOpenSession(reason: .skipAway, from: snapshot)
+        }
         let files = book.sortedFiles
         let urls = files.map { BookStorage.fileURL(bookID: book.id, relativePath: $0.relativePath) }
         let loaded = LoadedBook(
@@ -75,19 +80,32 @@ final class PlayerController {
         artwork = ArtworkStore.image(for: book)
         tint = ArtworkStore.averageColor(from: artwork ?? UIImage())
         snapshot = await engine.snapshot()
+        stats?.ingest(snapshot)
         NowPlayingBridge.shared.publish(snapshot, artwork: artwork)
     }
 
-    func play() async { await engine.play() }
-    func pause() async { await engine.pause() }
-    func toggle() async { await engine.toggle() }
+    func play() async {
+        await engine.play()
+        await publishImmediate()
+    }
+    func pause() async {
+        await engine.pause()
+        await publishImmediate(forcePersist: true)
+    }
+    func toggle() async {
+        await engine.toggle()
+        await publishImmediate(forcePersist: true)
+    }
     func seek(to time: TimeInterval) async { await engine.seek(to: time) }
     func skipBack() async { await engine.skip(interval: SettingsStore.shared.skipBack, forward: false) }
     func skipForward() async { await engine.skip(interval: SettingsStore.shared.skipForward, forward: true) }
     func nextChapter() async { await engine.nextChapter() }
     func previousChapter() async { await engine.previousChapter() }
     func jumpToStart() async { await engine.jumpToStart() }
-    func setRate(_ rate: Double) async { await engine.setRate(rate) }
+    func setRate(_ rate: Double) async {
+        await engine.setRate(rate)
+        await publishImmediate()
+    }
     func setBoost(_ boost: Double) async { await engine.setBoost(Float(boost)) }
     func startSleep(minutes: Double) async { await engine.startSleep(minutes: minutes) }
     func startSleepEndOfChapter() async { await engine.startSleepEndOfChapter() }
@@ -103,6 +121,19 @@ final class PlayerController {
 
     func persistNow() {
         persistIfNeeded(snapshot, force: true)
+    }
+
+    func closeStatsForTerminate() {
+        persistIfNeeded(snapshot, force: true)
+        stats?.closeOpenSession(reason: .background, from: snapshot)
+    }
+
+    private func publishImmediate(forcePersist: Bool = false) async {
+        let snap = await engine.snapshot()
+        snapshot = snap
+        persistIfNeeded(snap, force: forcePersist)
+        stats?.ingest(snap)
+        NowPlayingBridge.shared.publish(snap, artwork: artwork)
     }
 
     private func persistIfNeeded(_ snap: PlayerSnapshot, force: Bool = false) {
@@ -155,10 +186,12 @@ final class PlayerController {
         switch type {
         case .began:
             await engine.handleInterruptionBegan()
+            await publishImmediate(forcePersist: true)
         case .ended:
             let optionsValue = info[AVAudioSessionInterruptionOptionKey] as? UInt ?? 0
             let options = AVAudioSession.InterruptionOptions(rawValue: optionsValue)
             await engine.handleInterruptionEnded(shouldResume: options.contains(.shouldResume))
+            await publishImmediate()
         @unknown default:
             break
         }
@@ -170,6 +203,7 @@ final class PlayerController {
               let reason = AVAudioSession.RouteChangeReason(rawValue: reasonValue) else { return }
         if reason == .oldDeviceUnavailable {
             await engine.handleRouteChange(shouldPause: true)
+            await publishImmediate(forcePersist: true)
         }
     }
 }

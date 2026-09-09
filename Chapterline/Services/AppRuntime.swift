@@ -4,6 +4,7 @@ enum AppRuntime {
     static var library: LibraryStore!
     static var player: PlayerController!
     static var settings: SettingsStore!
+    static var stats: ListeningStatsStore!
 }
 
 extension Notification.Name {

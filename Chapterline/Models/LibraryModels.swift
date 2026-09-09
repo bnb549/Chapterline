@@ -12,6 +12,7 @@ final class Book {
     var lastPlayedAt: Date?
     var duration: TimeInterval
     var isFinished: Bool
+    var finishedAt: Date?
     var playbackRate: Double
     var position: TimeInterval
     var lastPauseAt: Date?
@@ -45,6 +46,7 @@ final class Book {
         self.addedAt = addedAt
         self.duration = duration
         self.isFinished = false
+        self.finishedAt = nil
         self.playbackRate = playbackRate
         self.position = 0
         self.files = []
