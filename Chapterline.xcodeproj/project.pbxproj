@@ -1,0 +1,805 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		DAFECE7F3050F80000367EF5 /* ChapterlineShare.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = DAFECE6D3050F80000367EF5 /* ChapterlineShare.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		DAFECE803050F80000367EF5 /* ChapterlineWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = DAFECE763050F80000367EF5 /* ChapterlineWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		DAFECE853050F80000367EF5 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = DAFECE6A3050F80000367EF5 /* ZIPFoundation */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		DAFECE833050F80000367EF5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DAFECE403050F45C00367EF5 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DAFECE723050F80000367EF5;
+			remoteInfo = ChapterlineShare;
+		};
+		DAFECE843050F80000367EF5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DAFECE403050F45C00367EF5 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DAFECE7B3050F80000367EF5;
+			remoteInfo = ChapterlineWidget;
+		};
+		DAFECE893050F80000367EF5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DAFECE403050F45C00367EF5 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DAFECE473050F45C00367EF5;
+			remoteInfo = "free player";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		DAFECE6C3050F80000367EF5 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				DAFECE7F3050F80000367EF5 /* ChapterlineShare.appex in Embed Foundation Extensions */,
+				DAFECE803050F80000367EF5 /* ChapterlineWidget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		DAFECE483050F45C00367EF5 /* Chapterline.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Chapterline.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DAFECE603050F80000367EF5 /* ChapterlineTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ChapterlineTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		DAFECE6D3050F80000367EF5 /* ChapterlineShare.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ChapterlineShare.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		DAFECE763050F80000367EF5 /* ChapterlineWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ChapterlineWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		DAFECE863050F80000367EF5 /* Exceptions for "ChapterlineShare" folder in "ChapterlineShare" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = DAFECE723050F80000367EF5 /* ChapterlineShare */;
+		};
+		DAFECE873050F80000367EF5 /* Exceptions for "ChapterlineWidget" folder in "ChapterlineWidget" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = DAFECE7B3050F80000367EF5 /* ChapterlineWidget */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		DAFECE4A3050F45C00367EF5 /* Chapterline */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Chapterline;
+			sourceTree = "<group>";
+		};
+		DAFECE613050F80000367EF5 /* ChapterlineTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = ChapterlineTests;
+			sourceTree = "<group>";
+		};
+		DAFECE6E3050F80000367EF5 /* ChapterlineShare */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				DAFECE863050F80000367EF5 /* Exceptions for "ChapterlineShare" folder in "ChapterlineShare" target */,
+			);
+			path = ChapterlineShare;
+			sourceTree = "<group>";
+		};
+		DAFECE773050F80000367EF5 /* ChapterlineWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				DAFECE873050F80000367EF5 /* Exceptions for "ChapterlineWidget" folder in "ChapterlineWidget" target */,
+			);
+			path = ChapterlineWidget;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		DAFECE453050F45C00367EF5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DAFECE853050F80000367EF5 /* ZIPFoundation in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAFECE623050F80000367EF5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAFECE6F3050F80000367EF5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAFECE783050F80000367EF5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		DAFECE3F3050F45C00367EF5 = {
+			isa = PBXGroup;
+			children = (
+				DAFECE4A3050F45C00367EF5 /* Chapterline */,
+				DAFECE613050F80000367EF5 /* ChapterlineTests */,
+				DAFECE6E3050F80000367EF5 /* ChapterlineShare */,
+				DAFECE773050F80000367EF5 /* ChapterlineWidget */,
+				DAFECE493050F45C00367EF5 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		DAFECE493050F45C00367EF5 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				DAFECE483050F45C00367EF5 /* Chapterline.app */,
+				DAFECE603050F80000367EF5 /* ChapterlineTests.xctest */,
+				DAFECE6D3050F80000367EF5 /* ChapterlineShare.appex */,
+				DAFECE763050F80000367EF5 /* ChapterlineWidget.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		DAFECE473050F45C00367EF5 /* Chapterline */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DAFECE533050F45E00367EF5 /* Build configuration list for PBXNativeTarget "Chapterline" */;
+			buildPhases = (
+				DAFECE443050F45C00367EF5 /* Sources */,
+				DAFECE453050F45C00367EF5 /* Frameworks */,
+				DAFECE463050F45C00367EF5 /* Resources */,
+				DAFECE6C3050F80000367EF5 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DAFECE813050F80000367EF5 /* PBXTargetDependency */,
+				DAFECE823050F80000367EF5 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				DAFECE4A3050F45C00367EF5 /* Chapterline */,
+			);
+			name = Chapterline;
+			packageProductDependencies = (
+				DAFECE6A3050F80000367EF5 /* ZIPFoundation */,
+			);
+			productName = "free player";
+			productReference = DAFECE483050F45C00367EF5 /* Chapterline.app */;
+			productType = "com.apple.product-type.application";
+		};
+		DAFECE653050F80000367EF5 /* ChapterlineTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DAFECE683050F80000367EF5 /* Build configuration list for PBXNativeTarget "ChapterlineTests" */;
+			buildPhases = (
+				DAFECE633050F80000367EF5 /* Sources */,
+				DAFECE623050F80000367EF5 /* Frameworks */,
+				DAFECE643050F80000367EF5 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DAFECE8A3050F80000367EF5 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				DAFECE613050F80000367EF5 /* ChapterlineTests */,
+			);
+			name = ChapterlineTests;
+			packageProductDependencies = (
+			);
+			productName = ChapterlineTests;
+			productReference = DAFECE603050F80000367EF5 /* ChapterlineTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		DAFECE723050F80000367EF5 /* ChapterlineShare */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DAFECE753050F80000367EF5 /* Build configuration list for PBXNativeTarget "ChapterlineShare" */;
+			buildPhases = (
+				DAFECE703050F80000367EF5 /* Sources */,
+				DAFECE6F3050F80000367EF5 /* Frameworks */,
+				DAFECE713050F80000367EF5 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				DAFECE6E3050F80000367EF5 /* ChapterlineShare */,
+			);
+			name = ChapterlineShare;
+			packageProductDependencies = (
+			);
+			productName = ChapterlineShare;
+			productReference = DAFECE6D3050F80000367EF5 /* ChapterlineShare.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		DAFECE7B3050F80000367EF5 /* ChapterlineWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DAFECE7E3050F80000367EF5 /* Build configuration list for PBXNativeTarget "ChapterlineWidget" */;
+			buildPhases = (
+				DAFECE793050F80000367EF5 /* Sources */,
+				DAFECE783050F80000367EF5 /* Frameworks */,
+				DAFECE7A3050F80000367EF5 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				DAFECE773050F80000367EF5 /* ChapterlineWidget */,
+			);
+			name = ChapterlineWidget;
+			packageProductDependencies = (
+			);
+			productName = ChapterlineWidget;
+			productReference = DAFECE763050F80000367EF5 /* ChapterlineWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		DAFECE403050F45C00367EF5 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2660;
+				LastUpgradeCheck = 2660;
+				TargetAttributes = {
+					DAFECE473050F45C00367EF5 = {
+						CreatedOnToolsVersion = 26.6;
+					};
+					DAFECE653050F80000367EF5 = {
+						CreatedOnToolsVersion = 26.6;
+						TestTargetID = DAFECE473050F45C00367EF5;
+					};
+					DAFECE723050F80000367EF5 = {
+						CreatedOnToolsVersion = 26.6;
+					};
+					DAFECE7B3050F80000367EF5 = {
+						CreatedOnToolsVersion = 26.6;
+					};
+				};
+			};
+			buildConfigurationList = DAFECE433050F45C00367EF5 /* Build configuration list for PBXProject "Chapterline" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = DAFECE3F3050F45C00367EF5;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				DAFECE693050F80000367EF5 /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = DAFECE493050F45C00367EF5 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				DAFECE473050F45C00367EF5 /* Chapterline */,
+				DAFECE653050F80000367EF5 /* ChapterlineTests */,
+				DAFECE723050F80000367EF5 /* ChapterlineShare */,
+				DAFECE7B3050F80000367EF5 /* ChapterlineWidget */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		DAFECE463050F45C00367EF5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAFECE643050F80000367EF5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAFECE713050F80000367EF5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAFECE7A3050F80000367EF5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		DAFECE443050F45C00367EF5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAFECE633050F80000367EF5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAFECE703050F80000367EF5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAFECE793050F80000367EF5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		DAFECE813050F80000367EF5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DAFECE723050F80000367EF5 /* ChapterlineShare */;
+			targetProxy = DAFECE833050F80000367EF5 /* PBXContainerItemProxy */;
+		};
+		DAFECE823050F80000367EF5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DAFECE7B3050F80000367EF5 /* ChapterlineWidget */;
+			targetProxy = DAFECE843050F80000367EF5 /* PBXContainerItemProxy */;
+		};
+		DAFECE8A3050F80000367EF5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DAFECE473050F45C00367EF5 /* Chapterline */;
+			targetProxy = DAFECE893050F80000367EF5 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		DAFECE513050F45E00367EF5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = K3HHM2VAUC;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		DAFECE523050F45E00367EF5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = K3HHM2VAUC;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		DAFECE543050F45E00367EF5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Chapterline/Chapterline.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = K3HHM2VAUC;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Chapterline-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = Chapterline;
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.benmonroe.free-player";
+				PRODUCT_MODULE_NAME = Chapterline;
+				PRODUCT_NAME = Chapterline;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		DAFECE553050F45E00367EF5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Chapterline/Chapterline.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = K3HHM2VAUC;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Chapterline-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = Chapterline;
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.benmonroe.free-player";
+				PRODUCT_MODULE_NAME = Chapterline;
+				PRODUCT_NAME = Chapterline;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		DAFECE663050F80000367EF5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = K3HHM2VAUC;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.benmonroe.free-player.tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Chapterline.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Chapterline";
+			};
+			name = Debug;
+		};
+		DAFECE673050F80000367EF5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = K3HHM2VAUC;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.benmonroe.free-player.tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Chapterline.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Chapterline";
+			};
+			name = Release;
+		};
+		DAFECE733050F80000367EF5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = ChapterlineShare/ChapterlineShare.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = K3HHM2VAUC;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ChapterlineShare/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Chapterline;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.benmonroe.free-player.share";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		DAFECE743050F80000367EF5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = ChapterlineShare/ChapterlineShare.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = K3HHM2VAUC;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ChapterlineShare/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Chapterline;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.benmonroe.free-player.share";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		DAFECE7C3050F80000367EF5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = ChapterlineWidget/ChapterlineWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = K3HHM2VAUC;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ChapterlineWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Chapterline;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.benmonroe.free-player.widget";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		DAFECE7D3050F80000367EF5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = ChapterlineWidget/ChapterlineWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = K3HHM2VAUC;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ChapterlineWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Chapterline;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.benmonroe.free-player.widget";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		DAFECE433050F45C00367EF5 /* Build configuration list for PBXProject "Chapterline" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DAFECE513050F45E00367EF5 /* Debug */,
+				DAFECE523050F45E00367EF5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DAFECE533050F45E00367EF5 /* Build configuration list for PBXNativeTarget "Chapterline" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DAFECE543050F45E00367EF5 /* Debug */,
+				DAFECE553050F45E00367EF5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DAFECE683050F80000367EF5 /* Build configuration list for PBXNativeTarget "ChapterlineTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DAFECE663050F80000367EF5 /* Debug */,
+				DAFECE673050F80000367EF5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DAFECE753050F80000367EF5 /* Build configuration list for PBXNativeTarget "ChapterlineShare" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DAFECE733050F80000367EF5 /* Debug */,
+				DAFECE743050F80000367EF5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DAFECE7E3050F80000367EF5 /* Build configuration list for PBXNativeTarget "ChapterlineWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DAFECE7C3050F80000367EF5 /* Debug */,
+				DAFECE7D3050F80000367EF5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		DAFECE693050F80000367EF5 /* XCRemoteSwiftPackageReference "ZIPFoundation" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/weichsel/ZIPFoundation.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.9.19;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		DAFECE6A3050F80000367EF5 /* ZIPFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DAFECE693050F80000367EF5 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
+			productName = ZIPFoundation;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = DAFECE403050F45C00367EF5 /* Project object */;
+}
