@@ -111,6 +111,7 @@ final class LibraryStore {
 
     func delete(_ book: Book) {
         let id = book.id
+        persistIdentity(for: book)
         context.delete(book)
         save()
         BookStorage.removeDirectory(for: id)
@@ -273,9 +274,9 @@ final class LibraryStore {
         if DRMGuard.isBlocked(url) {
             throw ImportError.drm
         }
-        let bookID = UUID()
-        let directory = try BookStorage.ensureDirectory(for: bookID)
-        let filename = uniqueFilename(url.lastPathComponent, in: directory)
+        let stagingID = UUID()
+        let directory = try BookStorage.ensureDirectory(for: stagingID)
+        let filename = BookStorage.uniqueFilename(url.lastPathComponent, in: directory)
         let destination = directory.appendingPathComponent(filename)
         try FileManager.default.copyItem(at: url, to: destination)
 
@@ -284,34 +285,26 @@ final class LibraryStore {
         }
 
         let metadata = await ChapterService.inspect(url: destination)
-        let markers = await ChapterService.parseChapters(files: [destination], bookTitle: metadata.title ?? FileOrdering.displayTitle(from: filename))
+        let title = metadata.title ?? FileOrdering.displayTitle(from: filename)
+        let markers = await ChapterService.parseChapters(files: [destination], bookTitle: title)
         if let artwork = metadata.artwork {
-            ArtworkStore.writeEmbedded(artwork, bookID: bookID)
+            ArtworkStore.writeEmbedded(artwork, bookID: stagingID)
         }
-        ArtworkStore.copyFolderCover(from: url.deletingLastPathComponent(), bookID: bookID)
+        ArtworkStore.copyFolderCover(from: url.deletingLastPathComponent(), bookID: stagingID)
 
-        let book = Book(
-            id: bookID,
-            title: metadata.title ?? FileOrdering.displayTitle(from: filename),
+        let file = BookFile(relativePath: filename, sortIndex: 0, duration: metadata.duration)
+        try await commitStagedImport(
+            stagingID: stagingID,
+            title: title,
             author: metadata.author ?? "Unknown Author",
             narrator: metadata.narrator,
             sourceFilename: filename,
             duration: metadata.duration,
-            playbackRate: SettingsStore.shared.defaultSpeed
+            files: [file],
+            markers: markers,
+            destinations: [destination],
+            filenames: [filename]
         )
-        let file = BookFile(relativePath: filename, sortIndex: 0, duration: metadata.duration)
-        file.book = book
-        book.files = [file]
-        for (index, marker) in markers.enumerated() {
-            let chapter = Chapter(title: marker.title, start: marker.start, duration: marker.duration, sortIndex: index, source: marker.source)
-            chapter.book = book
-            book.chapters.append(chapter)
-        }
-        if let reading = folders.first(where: { $0.name == "Currently Reading" }) {
-            book.folder = reading
-        }
-        context.insert(book)
-        save()
     }
 
     private func importCombined(_ urls: [URL]) async throws {
@@ -320,10 +313,11 @@ final class LibraryStore {
             _ = blocked
             throw ImportError.drm
         }
-        let bookID = UUID()
-        let directory = try BookStorage.ensureDirectory(for: bookID)
+        let stagingID = UUID()
+        let directory = try BookStorage.ensureDirectory(for: stagingID)
         var files: [BookFile] = []
         var destinations: [URL] = []
+        var filenames: [String] = []
         var totalDuration: TimeInterval = 0
 
         for (index, url) in sorted.enumerated() {
@@ -333,39 +327,99 @@ final class LibraryStore {
                     message: "Copying \(url.lastPathComponent)"
                 )
             }
-            let filename = uniqueFilename("\(String(format: "%03d", index))-\(url.lastPathComponent)", in: directory)
+            let filename = BookStorage.uniqueFilename(
+                "\(String(format: "%03d", index))-\(url.lastPathComponent)",
+                in: directory
+            )
             let destination = directory.appendingPathComponent(filename)
             try FileManager.default.copyItem(at: url, to: destination)
             let metadata = await ChapterService.inspect(url: destination)
             let file = BookFile(relativePath: filename, sortIndex: index, duration: metadata.duration)
             files.append(file)
             destinations.append(destination)
+            filenames.append(filename)
             totalDuration += metadata.duration
             if index == 0, let artwork = metadata.artwork {
-                ArtworkStore.writeEmbedded(artwork, bookID: bookID)
+                ArtworkStore.writeEmbedded(artwork, bookID: stagingID)
             }
         }
-        ArtworkStore.copyFolderCover(from: sorted[0].deletingLastPathComponent(), bookID: bookID)
+        ArtworkStore.copyFolderCover(from: sorted[0].deletingLastPathComponent(), bookID: stagingID)
 
         let firstMeta = await ChapterService.inspect(url: destinations[0])
         let title = firstMeta.title ?? FileOrdering.displayTitle(from: sorted[0].lastPathComponent)
         let markers = await ChapterService.parseChapters(files: destinations, bookTitle: title)
 
-        let book = Book(
-            id: bookID,
+        try await commitStagedImport(
+            stagingID: stagingID,
             title: title,
             author: firstMeta.author ?? "Unknown Author",
             narrator: firstMeta.narrator,
             sourceFilename: sorted.map(\.lastPathComponent).joined(separator: ", "),
             duration: totalDuration,
+            files: files,
+            markers: markers,
+            destinations: destinations,
+            filenames: filenames
+        )
+    }
+
+    private func commitStagedImport(
+        stagingID: UUID,
+        title: String,
+        author: String,
+        narrator: String?,
+        sourceFilename: String,
+        duration: TimeInterval,
+        files: [BookFile],
+        markers: [ChapterMarker],
+        destinations: [URL],
+        filenames: [String]
+    ) async throws {
+        let destinationPaths = destinations.map(\.path)
+        let fingerprint = await Task.detached {
+            BookIdentityMath.makeFingerprint(
+                title: title,
+                author: author,
+                duration: duration,
+                fileURLs: destinationPaths.map { URL(fileURLWithPath: $0) },
+                filenames: filenames
+            )
+        }.value
+
+        let resolution = resolveIdentity(fingerprint, stagingID: stagingID)
+        let bookID = resolution.bookID
+        if bookID != stagingID {
+            try BookStorage.moveDirectory(from: stagingID, to: bookID)
+        }
+
+        let book = Book(
+            id: bookID,
+            title: title,
+            author: author,
+            narrator: narrator,
+            sourceFilename: sourceFilename,
+            duration: duration,
             playbackRate: SettingsStore.shared.defaultSpeed
         )
+        book.identityKey = fingerprint.identityKey
+        // Reimport starts at 0 rather than guessing from the last session endPosition.
+        book.position = 0
+        if let finishedAt = resolution.finishedAt {
+            book.isFinished = true
+            book.finishedAt = finishedAt
+        }
         for file in files {
             file.book = book
             book.files.append(file)
         }
         for (index, marker) in markers.enumerated() {
-            let chapter = Chapter(title: marker.title, start: marker.start, duration: marker.duration, sortIndex: index, source: marker.source)
+            let chapter = Chapter(
+                title: marker.title,
+                start: marker.start,
+                duration: marker.duration,
+                sortIndex: index,
+                source: marker.source
+            )
             chapter.book = book
             book.chapters.append(chapter)
         }
@@ -373,19 +427,142 @@ final class LibraryStore {
             book.folder = reading
         }
         context.insert(book)
+        upsertBookIdentity(
+            bookID: bookID,
+            fingerprint: fingerprint,
+            title: title,
+            author: author,
+            narrator: narrator,
+            finishedAt: book.finishedAt
+        )
         save()
     }
 
-    private func uniqueFilename(_ name: String, in directory: URL) -> String {
-        var candidate = name
-        var step = 1
-        while FileManager.default.fileExists(atPath: directory.appendingPathComponent(candidate).path) {
-            let base = (name as NSString).deletingPathExtension
-            let ext = (name as NSString).pathExtension
-            candidate = ext.isEmpty ? "\(base)-\(step)" : "\(base)-\(step).\(ext)"
-            step += 1
+    func resolveIdentity(_ fingerprint: BookFingerprint, stagingID: UUID) -> BookIdentityResolution {
+        let books = (try? context.fetch(FetchDescriptor<Book>())) ?? []
+        let liveIDs = Set(books.map(\.id))
+        let identities = ((try? context.fetch(FetchDescriptor<BookIdentity>())) ?? []).map {
+            BookIdentityCandidate(
+                bookID: $0.bookID,
+                identityKey: $0.identityKey,
+                title: $0.title,
+                author: $0.author,
+                duration: $0.duration,
+                totalByteSize: $0.totalByteSize,
+                sourceSignature: $0.sourceSignature,
+                probeHash: $0.probeHash,
+                lastSeenAt: $0.lastSeenAt,
+                sessionCount: 0,
+                finishedAt: $0.finishedAt
+            )
         }
-        return candidate
+        let sessions = (try? context.fetch(FetchDescriptor<ListeningSession>())) ?? []
+        let orphans = BookIdentityMath.orphanCandidates(
+            sessions: sessions.map {
+                OrphanSessionInput(
+                    bookID: $0.bookID,
+                    identityKey: $0.identityKey,
+                    bookTitle: $0.bookTitle,
+                    author: $0.author,
+                    endedAt: $0.endedAt,
+                    endReason: $0.endReason
+                )
+            },
+            liveBookIDs: liveIDs
+        )
+        return BookIdentityMath.resolve(
+            fingerprint: fingerprint,
+            liveBookIDs: liveIDs,
+            identities: identities,
+            orphans: orphans,
+            stagingID: stagingID
+        )
+    }
+
+    private func persistIdentity(for book: Book) {
+        let filenames = book.sortedFiles.map(\.relativePath)
+        let urls = filenames.map { BookStorage.fileURL(bookID: book.id, relativePath: $0) }
+        let totalSize = urls.reduce(Int64(0)) { $0 + BookIdentityMath.byteSize(of: $1) }
+        let signature = BookIdentityMath.sourceSignature(filenames: filenames)
+        let key = book.identityKey ?? BookIdentityMath.identityKey(
+            title: book.title,
+            author: book.author,
+            duration: book.duration,
+            totalByteSize: totalSize,
+            fileCount: filenames.count,
+            sourceSignature: signature
+        )
+        let fingerprint = BookFingerprint(
+            identityKey: key,
+            title: book.title,
+            author: book.author,
+            duration: book.duration,
+            totalByteSize: totalSize,
+            fileCount: filenames.count,
+            sourceSignature: signature,
+            probeHash: nil,
+            filenames: filenames
+        )
+        upsertBookIdentity(
+            bookID: book.id,
+            fingerprint: fingerprint,
+            title: book.title,
+            author: book.author,
+            narrator: book.narrator,
+            finishedAt: book.finishedAt,
+            preserveExistingKey: true
+        )
+    }
+
+    private func upsertBookIdentity(
+        bookID: UUID,
+        fingerprint: BookFingerprint,
+        title: String,
+        author: String,
+        narrator: String?,
+        finishedAt: Date?,
+        preserveExistingKey: Bool = false,
+        now: Date = Date()
+    ) {
+        let existing = ((try? context.fetch(FetchDescriptor<BookIdentity>())) ?? []).first { $0.bookID == bookID }
+        if let existing {
+            if !preserveExistingKey {
+                existing.identityKey = fingerprint.identityKey
+                existing.totalByteSize = fingerprint.totalByteSize
+                existing.sourceSignature = fingerprint.sourceSignature
+                existing.probeHash = fingerprint.probeHash ?? existing.probeHash
+            } else if existing.identityKey.isEmpty {
+                existing.identityKey = fingerprint.identityKey
+            }
+            existing.title = title
+            existing.author = author
+            existing.narrator = narrator
+            existing.duration = fingerprint.duration
+            if !preserveExistingKey || existing.totalByteSize == 0 {
+                existing.totalByteSize = fingerprint.totalByteSize
+            }
+            if !preserveExistingKey || existing.sourceSignature.isEmpty {
+                existing.sourceSignature = fingerprint.sourceSignature
+            }
+            existing.lastSeenAt = now
+            existing.finishedAt = finishedAt
+        } else {
+            context.insert(
+                BookIdentity(
+                    identityKey: fingerprint.identityKey,
+                    bookID: bookID,
+                    title: title,
+                    author: author,
+                    narrator: narrator,
+                    duration: fingerprint.duration,
+                    totalByteSize: fingerprint.totalByteSize,
+                    sourceSignature: fingerprint.sourceSignature,
+                    probeHash: fingerprint.probeHash,
+                    lastSeenAt: now,
+                    finishedAt: finishedAt
+                )
+            )
+        }
     }
 
     private func seedDefaultFoldersIfNeeded() {

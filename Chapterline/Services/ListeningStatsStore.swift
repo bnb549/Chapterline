@@ -84,6 +84,7 @@ final class ListeningStatsStore {
         var rate: Double
         var startPosition: TimeInterval
         var chapterTitle: String
+        var identityKey: String?
     }
 
     init(container: ModelContainer, settings: SettingsStore = .shared) {
@@ -145,7 +146,8 @@ final class ListeningStatsStore {
             endPosition: max(0, endPosition),
             chapterTitle: chapterTitle,
             endReason: reason,
-            counted: true
+            counted: true,
+            identityKey: open.identityKey
         )
         context.insert(session)
         save()
@@ -187,8 +189,18 @@ final class ListeningStatsStore {
             titles[session.bookID] = (session.bookTitle, session.author)
         }
         let books = (try? context.fetch(FetchDescriptor<Book>())) ?? []
+        var didBackfill = false
         for book in books {
             titles[book.id] = (book.title, book.author)
+            if let key = book.identityKey {
+                for session in sessions where session.bookID == book.id && session.identityKey == nil {
+                    session.identityKey = key
+                    didBackfill = true
+                }
+            }
+        }
+        if didBackfill {
+            save()
         }
         let finished = books.compactMap { book -> (bookID: UUID, at: Date)? in
             guard let finishedAt = book.finishedAt else { return nil }
@@ -321,7 +333,8 @@ final class ListeningStatsStore {
             startedAt: now,
             rate: snap.rate > 0 ? snap.rate : 1,
             startPosition: snap.position,
-            chapterTitle: snap.chapterTitle
+            chapterTitle: snap.chapterTitle,
+            identityKey: identityKey(for: bookID)
         )
     }
 
@@ -329,6 +342,12 @@ final class ListeningStatsStore {
         let finished = snap.duration > 0 && snap.position >= snap.duration - 1
         if finished { return .finished }
         return snap.stopReason ?? .pause
+    }
+
+    private func identityKey(for bookID: UUID) -> String? {
+        var descriptor = FetchDescriptor<Book>()
+        descriptor.predicate = #Predicate { $0.id == bookID }
+        return (try? context.fetch(descriptor))?.first?.identityKey
     }
 
     private func fetchSessions() -> [ListeningSession] {

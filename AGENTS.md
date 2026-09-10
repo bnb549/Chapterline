@@ -54,6 +54,7 @@ No ViewModels folder. Views talk to `@Observable` stores via `Environment`. Do n
 - App Group `group.com.benmonroe.free-player`: share Inbox + Now Playing snapshot for the widget
 - Write `Book.position` every ~1s while playing, and immediately on pause, skip, chapter jump, route change, background, terminate
 - Deleting a book deletes the SwiftData row **and** its Documents folder
+- `BookIdentity` survives delete so a later reimport of the same files can reuse the old bookID and reconnect listening stats
 - Finished books stay until the user deletes them
 
 ## Isolation

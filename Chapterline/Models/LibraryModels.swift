@@ -17,6 +17,7 @@ final class Book {
     var position: TimeInterval
     var lastPauseAt: Date?
     var artworkOverridePath: String?
+    var identityKey: String?
     var folder: Folder?
 
     @Relationship(deleteRule: .cascade, inverse: \BookFile.book)
@@ -49,6 +50,7 @@ final class Book {
         self.finishedAt = nil
         self.playbackRate = playbackRate
         self.position = 0
+        self.identityKey = nil
         self.files = []
         self.chapters = []
         self.bookmarks = []
@@ -153,5 +155,47 @@ final class Folder {
         self.name = name
         self.sortIndex = sortIndex
         self.books = []
+    }
+}
+
+/// Survives `Book` deletion so a later reimport can reuse the same bookID and reconnect stats.
+@Model
+final class BookIdentity {
+    var identityKey: String
+    var bookID: UUID
+    var title: String
+    var author: String
+    var narrator: String?
+    var duration: TimeInterval
+    var totalByteSize: Int64
+    var sourceSignature: String
+    var probeHash: String?
+    var lastSeenAt: Date
+    var finishedAt: Date?
+
+    init(
+        identityKey: String,
+        bookID: UUID,
+        title: String,
+        author: String,
+        narrator: String? = nil,
+        duration: TimeInterval,
+        totalByteSize: Int64,
+        sourceSignature: String,
+        probeHash: String? = nil,
+        lastSeenAt: Date = Date(),
+        finishedAt: Date? = nil
+    ) {
+        self.identityKey = identityKey
+        self.bookID = bookID
+        self.title = title
+        self.author = author
+        self.narrator = narrator
+        self.duration = duration
+        self.totalByteSize = totalByteSize
+        self.sourceSignature = sourceSignature
+        self.probeHash = probeHash
+        self.lastSeenAt = lastSeenAt
+        self.finishedAt = finishedAt
     }
 }

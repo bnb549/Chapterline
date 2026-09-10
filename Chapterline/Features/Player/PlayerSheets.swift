@@ -242,48 +242,6 @@ struct SpeedSheet: View {
     }
 }
 
-struct BoostSheet: View {
-    @Environment(PlayerController.self) private var player
-    @Environment(SettingsStore.self) private var settings
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        NavigationStack {
-            VStack(alignment: .leading, spacing: 20) {
-                Text("Voice boost")
-                    .font(.title2.weight(.semibold))
-                Text("Raises dialogue without re-encoding. Peaks are clipped so it stays safe for headphones.")
-                    .foregroundStyle(Theme.textSecondary)
-                Slider(
-                    value: Binding(
-                        get: { settings.boost },
-                        set: { value in
-                            settings.boost = value
-                            Task { await player.setBoost(value) }
-                        }
-                    ),
-                    in: 1.0...2.0,
-                    step: 0.05
-                )
-                .tint(Color.accentColor)
-                .accessibilityLabel("Voice boost")
-                .accessibilityValue(String(format: "%.2f", settings.boost))
-                Text("\(settings.boost, specifier: "%.2f")×")
-                    .font(.headline.monospacedDigit())
-                Spacer()
-            }
-            .padding()
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-            .background(Theme.pageBackground(oled: settings.usesTrueBlack))
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() } }
-            }
-        }
-        .presentationDetents([.medium])
-        .presentationBackground(Theme.pageBackground(oled: settings.usesTrueBlack))
-    }
-}
-
 struct EditMetadataView: View {
     let book: Book
     @Environment(LibraryStore.self) private var library

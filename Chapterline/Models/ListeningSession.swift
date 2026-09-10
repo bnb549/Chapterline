@@ -30,6 +30,7 @@ final class ListeningSession {
     var chapterTitle: String
     var endReasonRaw: String
     var counted: Bool
+    var identityKey: String?
 
     init(
         id: UUID = UUID(),
@@ -46,7 +47,8 @@ final class ListeningSession {
         endPosition: TimeInterval,
         chapterTitle: String,
         endReason: SessionEndReason,
-        counted: Bool = true
+        counted: Bool = true,
+        identityKey: String? = nil
     ) {
         self.id = id
         self.bookID = bookID
@@ -63,6 +65,7 @@ final class ListeningSession {
         self.chapterTitle = chapterTitle
         self.endReasonRaw = endReason.rawValue
         self.counted = counted
+        self.identityKey = identityKey
     }
 
     var endReason: SessionEndReason {

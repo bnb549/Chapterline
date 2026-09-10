@@ -15,7 +15,6 @@ struct BookPlayerView: View {
     @State private var showSleep = false
     @State private var showSpeed = false
     @State private var showEdit = false
-    @State private var showBoost = false
     @State private var isScrubbing = false
     @State private var scrubPosition: TimeInterval = 0
 
@@ -36,7 +35,6 @@ struct BookPlayerView: View {
         .sheet(isPresented: $showSleep) { SleepTimerSheet() }
         .sheet(isPresented: $showSpeed) { SpeedSheet() }
         .sheet(isPresented: $showEdit) { if let book { EditMetadataView(book: book) } }
-        .sheet(isPresented: $showBoost) { BoostSheet() }
     }
 
     private func playerPage(_ book: Book) -> some View {
@@ -157,8 +155,8 @@ struct BookPlayerView: View {
             .accessibilityLabel("Speed \(String(format: "%.1f", player.snapshot.rate)) times")
             pill(sleepLabel, systemImage: "moon.zzz") { showSleep = true }
                 .accessibilityLabel(sleepAccessibility)
-            pill("Boost", systemImage: "waveform") { showBoost = true }
-                .accessibilityLabel("Voice boost")
+            pill("Chapters", systemImage: "list.bullet") { showChapters = true }
+                .accessibilityLabel("Chapters")
             pill("Marks", systemImage: "bookmark") { showBookmarks = true }
                 .accessibilityLabel("Bookmarks")
         }
