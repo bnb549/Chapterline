@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "ChapterLineV1.png",
+      "filename" : "ChapterLine Light  .png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -13,6 +13,7 @@
           "value" : "dark"
         }
       ],
+      "filename" : "ChapterLineDark.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
