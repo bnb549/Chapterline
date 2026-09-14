@@ -216,18 +216,24 @@ final class ListeningStatsStore {
             calendar: calendar
         )
         recentSessions = sessions.prefix(30).map { session in
-            SessionRow(
-                id: session.id,
-                bookID: session.bookID,
-                title: session.bookTitle,
-                author: session.author,
-                startedAt: session.startedAt,
-                wallDuration: session.wallDuration,
-                rate: session.rate,
-                chapterTitle: session.chapterTitle,
-                bookExists: existingIDs.contains(session.bookID)
-            )
+            makeSessionRow(session, existingIDs: existingIDs)
         }
+    }
+
+    func sessionsStarted(
+        on day: Date,
+        now: Date = Date(),
+        calendar: Calendar = .current
+    ) -> [SessionRow] {
+        _ = now
+        let target = calendar.startOfDay(for: day)
+        let sessions = fetchSessions()
+        let books = (try? context.fetch(FetchDescriptor<Book>())) ?? []
+        let existingIDs = Set(books.map(\.id))
+        return sessions
+            .filter { calendar.startOfDay(for: $0.startedAt) == target }
+            .sorted { $0.startedAt < $1.startedAt }
+            .map { makeSessionRow($0, existingIDs: existingIDs) }
     }
 
     func exportJSON() throws -> Data {
@@ -348,6 +354,20 @@ final class ListeningStatsStore {
         var descriptor = FetchDescriptor<Book>()
         descriptor.predicate = #Predicate { $0.id == bookID }
         return (try? context.fetch(descriptor))?.first?.identityKey
+    }
+
+    private func makeSessionRow(_ session: ListeningSession, existingIDs: Set<UUID>) -> SessionRow {
+        SessionRow(
+            id: session.id,
+            bookID: session.bookID,
+            title: session.bookTitle,
+            author: session.author,
+            startedAt: session.startedAt,
+            wallDuration: session.wallDuration,
+            rate: session.rate,
+            chapterTitle: session.chapterTitle,
+            bookExists: existingIDs.contains(session.bookID)
+        )
     }
 
     private func fetchSessions() -> [ListeningSession] {

@@ -18,7 +18,7 @@ Chapterline plays the audiobooks you already own. Import a file, pick up where y
 - Bookmarks the current time and jumps back to it
 - Smart-rewinds a few seconds when you resume after a pause
 - Combines several files into one book, or imports them as separate books
-- Tracks listening stats and reconnects them if you delete a book and later import the same files again
+- Tracks listening stats and reconnects them if you delete a book and later import the same files again. The stats heatmap is a tappable day grid with a legend and a session list for each day.
 
 ## What you can import
 

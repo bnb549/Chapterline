@@ -1,4 +1,3 @@
-import Charts
 import SwiftUI
 
 struct StatsView: View {
@@ -189,31 +188,14 @@ struct StatsView: View {
                     .font(.footnote)
                     .foregroundStyle(Theme.textSecondary)
             } else {
-                Chart(days) { day in
-                    RectangleMark(
-                        x: .value("Week", day.weekIndex),
-                        y: .value("Weekday", day.weekday)
-                    )
-                    .foregroundStyle(heatmapColor(for: day.wallDuration))
-                    .cornerRadius(3)
-                }
-                .chartXAxis(.hidden)
-                .chartYAxis {
-                    AxisMarks(values: [0, 2, 4, 6]) { value in
-                        AxisValueLabel {
-                            if let weekday = value.as(Int.self) {
-                                Text(weekdayLetter(weekday))
-                                    .font(.caption2)
-                                    .foregroundStyle(Theme.textTertiary)
-                            }
-                        }
-                    }
-                }
-                .chartYScale(domain: -0.5...6.5)
-                .frame(height: 148)
-                .accessibilityElement(children: .ignore)
-                .accessibilityLabel("Listening heatmap")
-                .accessibilityValue(heatmapValue(days))
+                HeatmapGrid(
+                    days: days,
+                    period: stats.period,
+                    usesTrueBlack: settings.usesTrueBlack,
+                    sessionsForDay: { stats.sessionsStarted(on: $0) },
+                    onOpenBook: { path.append($0) }
+                )
+                HeatmapLegend()
             }
         }
         .padding(16)
@@ -293,26 +275,6 @@ struct StatsView: View {
         return "\(session.title), \(time), \(rate), \(when)\(missing)"
     }
 
-    private func heatmapColor(for wall: TimeInterval) -> Color {
-        if wall <= 0 { return Theme.fill }
-        let minutes = wall / 60
-        if minutes < 15 { return Color.accentColor.opacity(0.28) }
-        if minutes < 45 { return Color.accentColor.opacity(0.5) }
-        if minutes < 90 { return Color.accentColor.opacity(0.75) }
-        return Color.accentColor
-    }
-
-    private func weekdayLetter(_ weekday: Int) -> String {
-        let symbols = Calendar.current.veryShortWeekdaySymbols
-        let index = (weekday + Calendar.current.firstWeekday - 1 + 7) % 7
-        guard symbols.indices.contains(index) else { return "" }
-        return symbols[index]
-    }
-
-    private func heatmapValue(_ days: [HeatmapDay]) -> String {
-        let active = days.filter { $0.wallDuration > 0 }.count
-        return "\(active) days with listening"
-    }
 }
 
 #if DEBUG

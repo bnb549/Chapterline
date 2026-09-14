@@ -3,7 +3,21 @@
 All notable changes to Chapterline are documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
-Versions follow the marketing labels used in recent commits (`v1.1`, `v1.2`).
+Versions follow the marketing labels used in recent commits (`v1.1`, `v1.2`, `v1.3`).
+
+## [1.3] — 2026-09-14
+
+### Added
+
+* Tappable heatmap days with a session sheet / iPad popover.
+* Heatmap legend (None · 15m · 45m · 90m · 1.5h+).
+* Today outline on the heatmap.
+* Month ticks on Year and All heatmaps.
+* Per-cell VoiceOver labels for heatmap days.
+
+### Changed
+
+* Year / All heatmap scrolls horizontally when the strip is wider than the card.
 
 ## [1.2] — 2026-09-10
 

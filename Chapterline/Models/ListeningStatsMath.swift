@@ -311,4 +311,64 @@ enum ListeningStatsMath: Sendable {
         }
         return "\(seconds)s"
     }
+
+    /// VoiceOver duration. 72 minutes → "1 hour 12 minutes". Under one minute uses seconds.
+    nonisolated static func formatSpoken(_ duration: TimeInterval, locale: Locale = .current) -> String {
+        let total = max(0, Int64(duration.rounded()))
+        let style: Duration.UnitsFormatStyle
+        if total < 60 {
+            style = .units(allowed: [.seconds], width: .wide, zeroValueUnits: .show(length: 1))
+        } else {
+            style = .units(allowed: [.hours, .minutes], width: .wide, zeroValueUnits: .hide)
+        }
+        let raw = Duration.seconds(total).formatted(style.locale(locale))
+        return raw.replacingOccurrences(of: ", ", with: " ")
+    }
+
+    /// Cell label: weekday, month, day, then spoken duration. Year only when `day` is not in `now`'s year.
+    nonisolated static func heatmapSpokenLabel(
+        day: Date,
+        wallDuration: TimeInterval,
+        now: Date = Date(),
+        calendar: Calendar = .current
+    ) -> String {
+        let locale = calendar.locale ?? .current
+        var style = Date.FormatStyle(locale: locale, calendar: calendar, timeZone: calendar.timeZone)
+            .weekday(.wide)
+            .month(.wide)
+            .day()
+        if calendar.component(.year, from: day) != calendar.component(.year, from: now) {
+            style = style.year()
+        }
+        let dateText = day.formatted(style)
+        if wallDuration <= 0 {
+            return "\(dateText), no listening"
+        }
+        return "\(dateText), \(formatSpoken(wallDuration, locale: locale))"
+    }
+
+    nonisolated static func showsMonthTicks(for period: StatsPeriod) -> Bool {
+        period == .year || period == .all
+    }
+
+    nonisolated static func monthTicks(days: [HeatmapDay], calendar: Calendar) -> [HeatmapMonthTick] {
+        let symbols = calendar.veryShortMonthSymbols
+        var ticks: [HeatmapMonthTick] = []
+        var seenWeeks = Set<Int>()
+        for day in days.sorted(by: { $0.day < $1.day }) {
+            guard calendar.component(.day, from: day.day) == 1 else { continue }
+            guard !seenWeeks.contains(day.weekIndex) else { continue }
+            let month = calendar.component(.month, from: day.day)
+            let index = month - 1
+            guard symbols.indices.contains(index) else { continue }
+            seenWeeks.insert(day.weekIndex)
+            ticks.append(HeatmapMonthTick(weekIndex: day.weekIndex, letter: symbols[index]))
+        }
+        return ticks
+    }
+}
+
+struct HeatmapMonthTick: Equatable, Sendable {
+    var weekIndex: Int
+    var letter: String
 }
