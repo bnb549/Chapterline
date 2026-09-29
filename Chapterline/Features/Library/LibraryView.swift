@@ -11,6 +11,8 @@ struct LibraryView: View {
     @State private var bookToDelete: Book?
     @State private var showFolderSheet = false
     @State private var path = NavigationPath()
+    @State private var chapterNotice: String?
+    @State private var chapterReloadFailed = false
 
     var selectedFolder: Folder? {
         guard let id = library.selectedFolderID else { return nil }
@@ -97,10 +99,18 @@ struct LibraryView: View {
                 Text("The sandbox copy and its progress will be removed.")
             }
             .overlay(alignment: .bottom) {
-                if let progress = library.importProgress {
-                    ImportBanner(progress: progress)
-                        .padding()
+                VStack(spacing: 8) {
+                    if let chapterNotice {
+                        ChapterReloadBanner(message: chapterNotice)
+                    }
+                    if let progress = library.importProgress {
+                        ImportBanner(progress: progress)
+                    }
                 }
+                .padding()
+            }
+            .alert("Couldn’t read chapters", isPresented: $chapterReloadFailed) {
+                Button("OK", role: .cancel) {}
             }
         }
     }
@@ -257,10 +267,34 @@ struct LibraryView: View {
                 Button(folder.name) { library.move(book, to: folder) }
             }
         }
+        Button {
+            Task { await reloadChapters(for: book) }
+        } label: {
+            Label("Reload chapters", systemImage: "arrow.clockwise")
+        }
+        .accessibilityLabel("Reload chapters from file")
         Button(role: .destructive) {
             bookToDelete = book
         } label: {
             Label("Delete", systemImage: "trash")
+        }
+    }
+
+    private func reloadChapters(for book: Book) async {
+        let outcome = await library.reloadChapters(for: book)
+        if case .found = outcome {
+            await player.refreshLoadedChapters(bookID: book.id)
+        }
+        guard let message = ChapterReloadFeedback.message(announcing: outcome) else {
+            chapterReloadFailed = true
+            return
+        }
+        chapterNotice = message
+        Task {
+            try? await Task.sleep(for: .seconds(2.6))
+            if chapterNotice == message {
+                chapterNotice = nil
+            }
         }
     }
 }

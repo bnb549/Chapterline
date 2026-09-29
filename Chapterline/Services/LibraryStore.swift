@@ -14,6 +14,8 @@ final class LibraryStore {
 
     let container: ModelContainer
     private let context: ModelContext
+    /// Books whose single persisted chapter was re-read this launch. Not saved.
+    @ObservationIgnored private var staleSingleChapterRescans: Set<UUID> = []
 
     init(container: ModelContainer) {
         self.container = container
@@ -243,10 +245,59 @@ final class LibraryStore {
         }
     }
 
-    func reloadChapters(for book: Book) async {
-        let urls = book.sortedFiles.map { BookStorage.fileURL(bookID: book.id, relativePath: $0.relativePath) }
+    func reloadChapters(for book: Book) async -> ChapterReloadOutcome {
+        let bookID = book.id
+        let urls = chapterFileURLs(for: book)
+        guard !urls.isEmpty, urls.allSatisfy({ FileManager.default.fileExists(atPath: $0.path) }) else {
+            return .failed
+        }
+        let position = book.position
+        let finished = book.isFinished
+        let finishedAt = book.finishedAt
         let markers = await ChapterService.parseChapters(files: urls, bookTitle: book.title)
         replaceChapters(on: book, with: markers)
+        restoreListeningState(bookID: bookID, position: position, finished: finished, finishedAt: finishedAt)
+        return .found(markers.count)
+    }
+
+    /// Re-read chapters once per launch when a book is a single chapter of `.m4b` / `.m4a`.
+    /// A still-single result leaves the row alone. Position and finished state stay put.
+    func rescanStaleSingleChapterBookIfNeeded(_ book: Book) async -> Int? {
+        guard book.sortedChapters.count == 1 else { return nil }
+        guard containsChapteredMPEG4(book) else { return nil }
+        guard staleSingleChapterRescans.insert(book.id).inserted else { return nil }
+        let bookID = book.id
+        let urls = chapterFileURLs(for: book)
+        guard !urls.isEmpty, urls.allSatisfy({ FileManager.default.fileExists(atPath: $0.path) }) else {
+            return nil
+        }
+        let position = book.position
+        let finished = book.isFinished
+        let finishedAt = book.finishedAt
+        let markers = await ChapterService.parseChapters(files: urls, bookTitle: book.title)
+        guard markers.count > 1 else { return markers.count }
+        replaceChapters(on: book, with: markers)
+        restoreListeningState(bookID: bookID, position: position, finished: finished, finishedAt: finishedAt)
+        return markers.count
+    }
+
+    private func chapterFileURLs(for book: Book) -> [URL] {
+        book.sortedFiles.map { BookStorage.fileURL(bookID: book.id, relativePath: $0.relativePath) }
+    }
+
+    private func containsChapteredMPEG4(_ book: Book) -> Bool {
+        book.sortedFiles.contains { file in
+            let ext = URL(fileURLWithPath: file.relativePath).pathExtension.lowercased()
+            return ext == "m4b" || ext == "m4a"
+        }
+    }
+
+    private func restoreListeningState(bookID: UUID, position: TimeInterval, finished: Bool, finishedAt: Date?) {
+        guard let stored = book(id: bookID) else { return }
+        stored.position = position
+        stored.isFinished = finished
+        stored.finishedAt = finishedAt
+        save()
     }
 
     private func performImport(_ urls: [URL], combine: Bool) async throws {
@@ -582,6 +633,11 @@ struct ImportProgress: Equatable {
 struct PendingCombine: Equatable {
     var urls: [URL]
     var blocked: [URL]
+}
+
+enum ChapterReloadOutcome: Equatable {
+    case found(Int)
+    case failed
 }
 
 enum ImportError: LocalizedError {

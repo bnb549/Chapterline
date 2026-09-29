@@ -17,6 +17,8 @@ struct BookPlayerView: View {
     @State private var showEdit = false
     @State private var isScrubbing = false
     @State private var scrubPosition: TimeInterval = 0
+    @State private var chapterNotice: String?
+    @State private var chapterReloadFailed = false
 
     var book: Book? { library.book(id: bookID) }
 
@@ -127,9 +129,12 @@ struct BookPlayerView: View {
                     Button("Chapters", systemImage: "list.bullet") { showChapters = true }
                     Button("Bookmarks", systemImage: "bookmark") { showBookmarks = true }
                     Button("Edit metadata", systemImage: "pencil") { showEdit = true }
-                    Button("Reload chapters", systemImage: "arrow.clockwise") {
-                        Task { await library.reloadChapters(for: book) }
+                    Button {
+                        Task { await reloadChapters(for: book) }
+                    } label: {
+                        Label("Reload chapters", systemImage: "arrow.clockwise")
                     }
+                    .accessibilityLabel("Reload chapters from file")
                     Button("Jump to start", systemImage: "backward.end") {
                         Task { await player.jumpToStart() }
                     }
@@ -139,10 +144,42 @@ struct BookPlayerView: View {
                 .accessibilityLabel("More actions")
             }
         }
+        .overlay(alignment: .bottom) {
+            if let chapterNotice {
+                ChapterReloadBanner(message: chapterNotice)
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 12)
+            }
+        }
+        .alert("Couldn’t read chapters", isPresented: $chapterReloadFailed) {
+            Button("OK", role: .cancel) {}
+        }
         .onChange(of: player.snapshot.rate) { _, rate in
             if let current = self.book, abs(current.playbackRate - rate) > 0.01 {
                 current.playbackRate = rate
                 library.save()
+            }
+        }
+    }
+
+    private func reloadChapters(for book: Book) async {
+        let outcome = await library.reloadChapters(for: book)
+        if case .found = outcome {
+            await player.refreshLoadedChapters(bookID: book.id)
+        }
+        showChapterReload(outcome)
+    }
+
+    private func showChapterReload(_ outcome: ChapterReloadOutcome) {
+        guard let message = ChapterReloadFeedback.message(announcing: outcome) else {
+            chapterReloadFailed = true
+            return
+        }
+        chapterNotice = message
+        Task {
+            try? await Task.sleep(for: .seconds(2.6))
+            if chapterNotice == message {
+                chapterNotice = nil
             }
         }
     }
@@ -195,6 +232,31 @@ struct BookPlayerView: View {
             ? ""
             : ", \(TimeMath.formatRemaining(duration: snap.duration, position: snap.position, rate: snap.rate))"
         return "\(book.title), \(snap.chapterTitle), \(String(format: "%.1f", snap.rate)) times\(remaining)"
+    }
+}
+
+enum ChapterReloadFeedback {
+    static func message(announcing outcome: ChapterReloadOutcome) -> String? {
+        guard case .found(let count) = outcome else { return nil }
+        let message = count == 1 ? "Still one chapter" : "\(count) chapters found"
+        UIAccessibility.post(notification: .announcement, argument: message)
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+        return message
+    }
+}
+
+struct ChapterReloadBanner: View {
+    let message: String
+
+    var body: some View {
+        Text(message)
+            .font(.subheadline.weight(.semibold))
+            .multilineTextAlignment(.center)
+            .foregroundStyle(Theme.textPrimary)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background(Theme.chrome, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .accessibilityLabel(message)
     }
 }
 

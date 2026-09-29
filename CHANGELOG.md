@@ -5,6 +5,24 @@ All notable changes to Chapterline are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions follow the marketing labels used in recent commits (`v1.1`, `v1.2`, `v1.3`).
 
+## [1.3.1] — 2026-09-29
+
+### Fixed
+
+* Nero `chpl` version 0 (1-byte count), version 1 (4-byte count at offset 4), and the reserved-byte-before-count layout now import as real chapters. Garbage timestamps are rejected, titles are capped, and starts have to be finite and non-decreasing.
+* A single AVFoundation or timed-metadata group that spans the whole file no longer hides a richer Nero chapter list.
+* The MP4 box walk also looks inside `ilst` and `uuid`. 64-bit box sizes and a `moov` atom after `mdat` still work.
+* Opening a book that still has exactly one chapter re-reads `.m4b` / `.m4a` chapters once per launch. Listening position stays where it was.
+
+### Added
+
+* Import and chapter reload log one line: `av`, `timed`, `nero`, `chosen`, and which list was used (`chapters url=<filename> …`).
+* Reload chapters, in the library context menu and the player overflow. VoiceOver: “Reload chapters from file”. Confirmation is the new count (“12 chapters found” / “Still one chapter”).
+
+A file with a broken QuickTime chapter track and no Nero `chpl` is still one chapter here. A container-only remux, which does not re-encode audio, rebuilds a table players can read:
+
+`ffmpeg -i book.m4b -c copy -map_chapters 0 -brand "M4B " -metadata media_type=2 -f mp4 fixed.m4b`
+
 ## [1.3] — 2026-09-14
 
 ### Added

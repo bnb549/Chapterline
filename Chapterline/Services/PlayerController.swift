@@ -82,6 +82,36 @@ final class PlayerController {
         snapshot = await engine.snapshot()
         stats?.ingest(snapshot)
         NowPlayingBridge.shared.publish(snapshot, artwork: artwork)
+        scheduleStaleChapterRescan(for: book.id)
+    }
+
+    /// Push a chapter reload into a book that is already loaded, without seeking.
+    func refreshLoadedChapters(bookID: UUID) async {
+        guard loadedBookID == bookID, let book = AppRuntime.library?.book(id: bookID) else { return }
+        await load(book: book)
+    }
+
+    private func scheduleStaleChapterRescan(for bookID: UUID) {
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            await self.rescanStaleChaptersIfNeeded(bookID: bookID)
+        }
+    }
+
+    private func rescanStaleChaptersIfNeeded(bookID: UUID) async {
+        guard let library = AppRuntime.library, let book = library.book(id: bookID) else { return }
+        let position = book.position
+        let finished = book.isFinished
+        let finishedAt = book.finishedAt
+        guard let count = await library.rescanStaleSingleChapterBookIfNeeded(book), count > 1 else { return }
+        guard loadedBookID == bookID, let updated = library.book(id: bookID) else { return }
+        if updated.position != position || updated.isFinished != finished || updated.finishedAt != finishedAt {
+            updated.position = position
+            updated.isFinished = finished
+            updated.finishedAt = finishedAt
+            library.save()
+        }
+        await load(book: updated)
     }
 
     func play() async {

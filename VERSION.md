@@ -10,11 +10,11 @@ Build number source of truth: Xcode CURRENT_PROJECT_VERSION (integer, monotonic)
 
 ## Current
 
-- Marketing: 1.3
-- Build: 2
+- Marketing: 1.3.1
+- Build: 3
 - Channel: local
-- Date: 2026-09-14
-- Git: main / 2c1cd0e
+- Date: 2026-09-29
+- Git: main (bnb549/Chapterline) — apply after 1.3
 
 ## SemVer rules
 
@@ -24,6 +24,17 @@ Build number source of truth: Xcode CURRENT_PROJECT_VERSION (integer, monotonic)
 - Build number: increment on every archive / TestFlight upload, even if marketing version is unchanged
 
 ## History
+
+### 1.3.1 — 2026-09-29 — build 3
+
+- PATCH. AudiobookBinder Pro / ffmpeg-style M4Bs that store Nero `chpl` (or a dummy QuickTime group plus a real `chpl` table) import with their real chapter list.
+- Fixed: `parseNero` version 0 (1-byte count), version 1 (4-byte count at offset 4), reserved-byte variant; reject insane timestamps; cap titles; require non-decreasing starts.
+- Fixed: a single AVFoundation or timed-metadata group that spans the whole file no longer blocks the Nero walker. Richer valid list wins.
+- Fixed: box walk also recurses `ilst` and `uuid`; still handles 64-bit sizes and `moov` after `mdat`.
+- Added: one-line import/reload log (`av` / `timed` / `nero` / `chosen` / `path`).
+- Added: one-shot chapter reload on open when a book currently has exactly one chapter; explicit Reload chapters action.
+- Known limits: QuickTime text tracks without a valid `tref/chap` are still invisible to AVFoundation; this PATCH does not parse QT samples itself. One-file Binder exports that truly contain a single 0→end marker stay one chapter. Already-imported multi-chapter books are not re-parsed automatically.
+- Files touched: `ChapterService.swift`, `MP4ChapterParser.swift`, library/player reload hook, `PlayerSheets.swift` (SwiftData import), `ChapterlineTests/MP4ChapterParserTests.swift`, `ChapterlineTests/ChapterServiceFallbackTests.swift`, `CHANGELOG.md`, `VERSION.md`.
 
 ### 1.3 — 2026-09-14 — build 2
 
