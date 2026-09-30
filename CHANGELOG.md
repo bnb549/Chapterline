@@ -5,6 +5,22 @@ All notable changes to Chapterline are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions follow the marketing labels used in recent commits (`v1.1`, `v1.2`, `v1.3`).
 
+## [1.3.2] — 2026-09-30
+
+### Fixed
+
+* AudiobookBinder Pro / Apple-track M4Bs that 1.3.1 still imported as one synthetic book-title chapter now read the QuickTime text / tx3g chapter track.
+* `embeddedChapters` walks every `availableChapterLocales` locale (`und` / `eng` included), not only `bestMatchingPreferredLanguages`.
+* Nero timestamps are retried across 100 ns, microseconds, milliseconds, seconds, and the movie or audio timescale when the 100 ns parse yields 0–1 usable markers.
+* `meta` is walked both as a FullBox and as a plain QuickTime box, so a `chpl` under either layout is visible.
+
+### Added
+
+* `AVAssetReader` sample parser for text / tx3g tracks, `ChapterPickPath.textTrack`, and audio `.chapterList` track associations.
+* Chapter log keys `text=`, `locales=`, and `tracks=`.
+
+A Binder export with no Chapters block and no text track is still one chapter. This release does not remux files.
+
 ## [1.3.1] — 2026-09-29
 
 ### Fixed

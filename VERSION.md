@@ -10,11 +10,11 @@ Build number source of truth: Xcode CURRENT_PROJECT_VERSION (integer, monotonic)
 
 ## Current
 
-- Marketing: 1.3.1
-- Build: 3
+- Marketing: 1.3.2
+- Build: 4
 - Channel: local
-- Date: 2026-09-29
-- Git: main (bnb549/Chapterline) — apply after 1.3
+- Date: 2026-09-30
+- Git: fix/qt-text-track-1.3.2 (bnb549/Chapterline) — apply after 1.3.1
 
 ## SemVer rules
 
@@ -24,6 +24,16 @@ Build number source of truth: Xcode CURRENT_PROJECT_VERSION (integer, monotonic)
 - Build number: increment on every archive / TestFlight upload, even if marketing version is unchanged
 
 ## History
+
+### 1.3.2 — 2026-09-30 — build 4
+
+- PATCH. Apple-track / AudiobookBinder Pro M4Bs that 1.3.1 still imported as one synthetic book-title chapter now read the QuickTime text / tx3g chapter track.
+- Fixed: `embeddedChapters` walks every `availableChapterLocales` locale (`und` / `eng` included), not only `bestMatchingPreferredLanguages`.
+- Added: `AVAssetReader` sample parser for text / tx3g tracks; `ChapterPickPath.textTrack`; follow audio `.chapterList` associations.
+- Fixed: Nero timestamp retry across 100 ns / µs / ms / seconds / movie-audio timescale when the 100 ns parse yields 0–1 usable markers.
+- Fixed: `meta` walked as both FullBox and not, so a `chpl` under QuickTime `meta` is visible.
+- Added: log keys `text=`, `locales=`, `tracks=`.
+- Known limits: a Binder export with no Chapters block and no text track is still one chapter. This PATCH does not remux files.
 
 ### 1.3.1 — 2026-09-29 — build 3
 

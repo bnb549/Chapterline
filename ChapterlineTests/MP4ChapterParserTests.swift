@@ -220,6 +220,85 @@ final class MP4ChapterParserTests: XCTestCase {
         XCTAssertFalse(markers.contains { abs($0.start - 10) < 0.05 })
     }
 
+    func testMillisecondTicksRetryWhenHundredNanosecondsCluster() {
+        let data = NeroFixture.payload(
+            version: 0,
+            countWidth: 1,
+            reservedByte: false,
+            raw: [
+                (ticks: 0, title: Data("One".utf8)),
+                (ticks: 60_000, title: Data("Two".utf8)),
+                (ticks: 120_000, title: Data("Three".utf8))
+            ]
+        )
+        let markers = MP4ChapterParser.parseNero(data, fileDuration: 180)
+        XCTAssertEqual(markers.map(\.title), ["One", "Two", "Three"])
+        XCTAssertEqual(markers.map(\.start), [0, 60, 120])
+        XCTAssertGreaterThanOrEqual(markers.count, 2)
+    }
+
+    func testHundredNanosecondScaleStaysWhenAlreadyPlausible() {
+        let data = NeroFixture.payload(
+            version: 0,
+            countWidth: 1,
+            reservedByte: false,
+            chapters: [(0, "A"), (60, "B"), (120, "C")]
+        )
+        let markers = MP4ChapterParser.parseNero(data, fileDuration: 180, timescales: [1_000, 44_100])
+        XCTAssertEqual(markers.map(\.title), ["A", "B", "C"])
+        XCTAssertEqual(markers.map(\.start), [0, 60, 120])
+    }
+
+    func testClusteredTicksAreDroppedWhenNoScaleFits() {
+        let raw = (0..<40).map { (ticks: UInt64($0), title: Data("C\($0)".utf8)) }
+        let data = NeroFixture.payload(version: 0, countWidth: 1, reservedByte: false, raw: raw)
+        XCTAssertTrue(MP4ChapterParser.parseNero(data, fileDuration: 3_600).isEmpty)
+    }
+
+    func testMovieTimescaleRescuesChplTicks() throws {
+        let chpl = NeroFixture.box(
+            "chpl",
+            NeroFixture.payload(
+                version: 1,
+                countWidth: 4,
+                reservedByte: false,
+                raw: [
+                    (ticks: 0, title: Data("One".utf8)),
+                    (ticks: 44_100 * 60, title: Data("Two".utf8)),
+                    (ticks: 44_100 * 120, title: Data("Three".utf8))
+                ]
+            )
+        )
+        let mvhd = NeroFixture.box("mvhd", NeroFixture.header(timescale: 44_100, duration: 44_100 * 180))
+        let mdhd = NeroFixture.box("mdhd", NeroFixture.header(timescale: 44_100, duration: 44_100 * 180))
+        let hdlr = NeroFixture.box("hdlr", NeroFixture.soundHandlerPayload())
+        let file = NeroFixture.box(
+            "moov",
+            mvhd + NeroFixture.box("trak", NeroFixture.box("mdia", mdhd + hdlr)) + NeroFixture.box("udta", chpl)
+        )
+        let markers = try markersInFile(file)
+        XCTAssertEqual(markers.map(\.title), ["One", "Two", "Three"])
+        XCTAssertEqual(markers[1].start, 60, accuracy: 0.01)
+        XCTAssertEqual(markers[2].start, 120, accuracy: 0.01)
+    }
+
+    func testHundredNanosecondChplIgnoresMovieTimescale() throws {
+        let chpl = NeroFixture.chapterBox(chapters: [(0, "A"), (60, "B"), (120, "C")])
+        let mvhd = NeroFixture.box("mvhd", NeroFixture.header(timescale: 44_100, duration: 44_100 * 180))
+        let file = NeroFixture.box("moov", mvhd + NeroFixture.box("udta", chpl))
+        let markers = try markersInFile(file)
+        XCTAssertEqual(markers.map(\.start), [0, 60, 120])
+    }
+
+    func testChplUnderQuickTimeMetaWithoutFullBox() throws {
+        let chpl = NeroFixture.chapterBox(chapters: [(0, "Bare"), (9, "Meta")])
+        let meta = NeroFixture.box("ilst", chpl)
+        let file = NeroFixture.box("moov", NeroFixture.box("udta", NeroFixture.box("meta", meta)))
+        let markers = try markersInFile(file)
+        XCTAssertEqual(markers.map(\.title), ["Bare", "Meta"])
+        XCTAssertEqual(markers[1].start, 9, accuracy: 0.001)
+    }
+
     private func markersInFile(_ data: Data) throws -> [ChapterMarker] {
         let url = try NeroFixture.write(data)
         defer { try? FileManager.default.removeItem(at: url) }
@@ -290,6 +369,19 @@ enum NeroFixture {
         append(UInt32(0), to: &data)
         data.append(contentsOf: type.utf8)
         data.append(payload)
+        return data
+    }
+
+    static func header(timescale: UInt32, duration: UInt32) -> Data {
+        var data = Data(count: 12)
+        append(timescale, to: &data)
+        append(duration, to: &data)
+        return data
+    }
+
+    static func soundHandlerPayload() -> Data {
+        var data = Data([0, 0, 0, 0, 0, 0, 0, 0])
+        data.append(contentsOf: "soun".utf8)
         return data
     }
 
