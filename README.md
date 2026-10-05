@@ -64,13 +64,13 @@ See [CHANGELOG.md](CHANGELOG.md) for version history and [AGENTS.md](AGENTS.md) 
 
 ## Open in Xcode
 
-1. Open `Chapterline.xcodeproj` (Xcode 16 / 26+). Older checkouts may still show `free player.xcodeproj`.
-2. Select the app scheme (the product is `Chapterline.app`).
+1. Open `Chapterline.xcodeproj` (Xcode 16 / 26+).
+2. Select the **Chapterline** scheme (the product is `Chapterline.app`).
 3. Pick an **iOS 17+** Simulator (iPhone) or a signed device.
-4. Signing: Automatic, team `K3HHM2VAUC`, bundle `com.benmonroe.free-player`.
+4. Signing: Automatic, team `K3HHM2VAUC`, bundle `com.benmonroe.ChapterLine`.
 5. Run.
 
-The home-screen name is **Chapterline**. The Swift module is `Chapterline`. The bundle ID remains `com.benmonroe.free-player`.
+The home-screen name is **Chapterline**. The Swift module is `Chapterline`. The bundle ID is `com.benmonroe.ChapterLine`.
 
 ### Capabilities
 
@@ -79,9 +79,8 @@ In the app target → *Signing & Capabilities*:
 | Capability | Required | Notes |
 |---|---|---|
 | Background Modes → **Audio** | Yes | Already set via `UIBackgroundModes` in `Info.plist` |
-| **App Groups** `group.com.benmonroe.free-player` | Yes | Share extension inbox + widget snapshot |
+| **App Groups** `group.com.benmonroe.ChapterLine` | Yes | Share extension inbox + widget snapshot |
 | File Sharing (`UIFileSharingEnabled`) | Optional | Off by default. Flip in `Info.plist` for Finder access to `Documents/` |
-| CarPlay Audio | Optional | Now Playing works without it. Library/chapter browse in a car needs Apple’s `com.apple.developer.carplay-audio` entitlement. Simulator CarPlay does not. |
 
 The Share extension and Widget targets must use the same App Group and the same development team.
 
@@ -91,7 +90,5 @@ The Share extension and Widget targets must use the same App Group and the same 
 export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
 xcodebuild -scheme "Chapterline" -destination 'platform=iOS Simulator,name=iPhone 16' test
 ```
-
-If the scheme is still named `free player` in your checkout, use that name instead.
 
 Unit tests cover chapter time math, rate-adjusted remaining time, smart-rewind windows, combine-files ordering, DRM extension rejection, and book identity matching.

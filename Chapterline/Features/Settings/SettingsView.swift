@@ -15,7 +15,6 @@ struct SettingsView: View {
                     rewindSection
                     appearanceSection
                     statsSection
-                    carPlaySection
                     aboutSection
                 }
                 .scrollContentBackground(.hidden)
@@ -177,19 +176,6 @@ struct SettingsView: View {
         }
     }
 
-    private var carPlaySection: some View {
-        Section("CarPlay") {
-            Toggle("Show player on launch", isOn: Binding(
-                get: { settings.carPlayOpenPlayerOnLaunch },
-                set: { settings.carPlayOpenPlayerOnLaunch = $0 }
-            ))
-            .accessibilityLabel("Show player on CarPlay launch")
-            Text("Now Playing always works. Browsing the library in a car needs Apple’s CarPlay Audio entitlement.")
-                .font(.footnote)
-                .foregroundStyle(Theme.textSecondary)
-        }
-    }
-
     private var aboutSection: some View {
         Section("About") {
             LabeledContent("App", value: "Chapterline")
@@ -197,6 +183,21 @@ struct SettingsView: View {
             Text("No account. No store. No ads. Files stay on this device. Audible .aa / .aax is not supported.")
                 .font(.footnote)
                 .foregroundStyle(Theme.textSecondary)
+            Link(destination: AboutLink.privacy) {
+                Label("Privacy Policy", systemImage: "hand.raised")
+                    .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+            }
+            .accessibilityLabel("Privacy Policy")
+            Link(destination: AboutLink.support) {
+                Label("Support", systemImage: "questionmark.circle")
+                    .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+            }
+            .accessibilityLabel("Support")
         }
     }
+}
+
+private enum AboutLink {
+    static let privacy = URL(string: "https://bnb549.github.io/privacy.html")!
+    static let support = URL(string: "https://bnb549.github.io/support.html")!
 }

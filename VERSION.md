@@ -1,7 +1,7 @@
 # VERSION
 
 App: Chapterline
-Bundle ID: com.benmonroe.free-player
+Bundle ID: com.benmonroe.ChapterLine
 Platforms: iOS 17+ / iPadOS 17+
 Xcode: 16+
 Swift: 6
@@ -11,10 +11,11 @@ Build number source of truth: Xcode CURRENT_PROJECT_VERSION (integer, monotonic)
 ## Current
 
 - Marketing: 1.3.2
-- Build: 4
-- Channel: local
-- Date: 2026-09-30
+- Build: 5
+- Channel: App Store prep
+- Date: 2026-10-05
 - Git: fix/qt-text-track-1.3.2 (bnb549/Chapterline) — apply after 1.3.1
+- App, share extension, and widget all ship as 1.3.2 (5)
 
 ## SemVer rules
 
@@ -24,6 +25,11 @@ Build number source of truth: Xcode CURRENT_PROJECT_VERSION (integer, monotonic)
 - Build number: increment on every archive / TestFlight upload, even if marketing version is unchanged
 
 ## History
+
+### 1.3.2 — 2026-10-05 — build 5
+
+- Build bump for App Store submission. Marketing version stays 1.3.2.
+- Share extension and widget marketing version moved from 1.0 (1) to 1.3.2 (5), matching the app.
 
 ### 1.3.2 — 2026-09-30 — build 4
 

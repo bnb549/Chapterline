@@ -90,4 +90,4 @@ Commit: [`e90dc0e`](https://github.com/bnb549/Chapterline/commit/e90dc0ee60b4044
 - Embedded chapter support; files with no chapters treated as one chapter spanning the duration.
 - Background audio, Lock Screen / Control Center Now Playing, skip back/forward, speed, sleep timer (end of chapter with fade), bookmarks, smart rewind.
 - Combine multiple files into one book or import them as separate books.
-- Share extension and home-screen widget via App Group `group.com.benmonroe.free-player`.
+- Share extension and home-screen widget via App Group `group.com.benmonroe.ChapterLine`.

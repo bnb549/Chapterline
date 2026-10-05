@@ -29,7 +29,7 @@ struct Provider: TimelineProvider {
     }
 
     private func loadSnapshot() -> WidgetSnapshot {
-        let url = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.benmonroe.free-player")?
+        let url = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.benmonroe.ChapterLine")?
             .appendingPathComponent("now-playing.json")
         if let url, let data = try? Data(contentsOf: url),
            let decoded = try? JSONDecoder().decode(FileSnapshot.self, from: data) {

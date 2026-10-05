@@ -19,7 +19,7 @@ final class ShareViewController: UIViewController {
     }
 
     private func copyAttachments() async {
-        guard let inbox = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.benmonroe.free-player")?
+        guard let inbox = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.benmonroe.ChapterLine")?
             .appendingPathComponent("Inbox", isDirectory: true) else {
             finish(cancelled: true)
             return
@@ -52,7 +52,7 @@ final class ShareViewController: UIViewController {
         }
 
         let notification = CFNotificationCenterGetDarwinNotifyCenter()
-        CFNotificationCenterPostNotification(notification, CFNotificationName("com.benmonroe.free-player.import" as CFString), nil, nil, true)
+        CFNotificationCenterPostNotification(notification, CFNotificationName("com.benmonroe.ChapterLine.import" as CFString), nil, nil, true)
         finish(cancelled: copied == 0)
     }
 

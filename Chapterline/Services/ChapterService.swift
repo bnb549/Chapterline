@@ -25,7 +25,7 @@ nonisolated struct ChapterListChoice: Equatable, Sendable {
 }
 
 enum ChapterService {
-    private static let chapterLogger = Logger(subsystem: "com.benmonroe.free-player", category: "chapters")
+    private static let chapterLogger = Logger(subsystem: "com.benmonroe.ChapterLine", category: "chapters")
     private nonisolated static let sampleCap = 10_000
     private nonisolated static let titleCap = 1_024
     private nonisolated static let qtTextSubtype: FourCharCode = 0x74657874

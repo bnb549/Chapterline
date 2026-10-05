@@ -79,10 +79,10 @@ enum BookStorage {
 }
 
 enum AppGroup {
-    static let identifier = "group.com.benmonroe.free-player"
+    static let identifier = "group.com.benmonroe.ChapterLine"
     static let inboxFolder = "Inbox"
     static let snapshotFilename = "now-playing.json"
-    static let darwinImport = "com.benmonroe.free-player.import"
+    static let darwinImport = "com.benmonroe.ChapterLine.import"
 
     static var containerURL: URL? {
         FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: identifier)

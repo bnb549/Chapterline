@@ -34,9 +34,6 @@ final class SettingsStore {
     var allowBookScrubbing: Bool {
         didSet { defaults.set(allowBookScrubbing, forKey: Key.allowBookScrubbing) }
     }
-    var carPlayOpenPlayerOnLaunch: Bool {
-        didSet { defaults.set(carPlayOpenPlayerOnLaunch, forKey: Key.carPlayOpen) }
-    }
     var libraryLayout: LibraryLayout {
         didSet { defaults.set(libraryLayout.rawValue, forKey: Key.layout) }
     }
@@ -67,7 +64,6 @@ final class SettingsStore {
         }
         hideRemainingTime = defaults.bool(forKey: Key.hideRemaining)
         allowBookScrubbing = defaults.object(forKey: Key.allowBookScrubbing) as? Bool ?? true
-        carPlayOpenPlayerOnLaunch = defaults.object(forKey: Key.carPlayOpen) as? Bool ?? true
         libraryLayout = LibraryLayout(rawValue: defaults.string(forKey: Key.layout) ?? "grid") ?? .grid
         librarySort = LibrarySort(rawValue: defaults.string(forKey: Key.sort) ?? "recent") ?? .recent
         shakeToExtendSleep = defaults.object(forKey: Key.shakeExtend) as? Bool ?? true
@@ -94,7 +90,6 @@ final class SettingsStore {
         static let appearance = "settings.appearance"
         static let hideRemaining = "settings.hideRemaining"
         static let allowBookScrubbing = "settings.allowBookScrubbing"
-        static let carPlayOpen = "settings.carPlayOpen"
         static let layout = "settings.layout"
         static let sort = "settings.sort"
         static let shakeExtend = "settings.shakeExtend"

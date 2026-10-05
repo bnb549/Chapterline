@@ -29,7 +29,7 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>com.benmonroe.free-player</string>
+			<string>com.benmonroe.ChapterLine</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>chapterline</string>
@@ -43,25 +43,8 @@
 			<string>Chapterline</string>
 		</dict>
 	</array>
-	<key>UIApplicationSceneManifest</key>
-	<dict>
-		<key>UIApplicationSupportsMultipleScenes</key>
-		<true/>
-		<key>UISceneConfigurations</key>
-		<dict>
-			<key>CPTemplateApplicationSceneSessionRoleApplication</key>
-			<array>
-				<dict>
-					<key>UISceneClassName</key>
-					<string>CPTemplateApplicationScene</string>
-					<key>UISceneConfigurationName</key>
-					<string>CarPlay</string>
-					<key>UISceneDelegateClassName</key>
-					<string>$(PRODUCT_MODULE_NAME).CarPlaySceneDelegate</string>
-				</dict>
-			</array>
-		</dict>
-	</dict>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>
