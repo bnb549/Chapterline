@@ -20,6 +20,8 @@ struct LibraryView: View {
     @State private var path = NavigationPath()
     @State private var chapterNotice: String?
     @State private var chapterReloadFailed = false
+    @State private var sampleAlreadyPresent = false
+    @State private var isAddingSample = false
 
     var selectedFolder: Folder? {
         guard let id = library.selectedFolderID else { return nil }
@@ -123,10 +125,23 @@ struct LibraryView: View {
         }
     }
 
-    @ViewBuilder
     private var content: some View {
+        libraryContent
+            .alert("Already in your library", isPresented: $sampleAlreadyPresent) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text("The Raven is already in your library.")
+            }
+    }
+
+    @ViewBuilder
+    private var libraryContent: some View {
         if library.books.isEmpty && search.isEmpty && selectedFolder == nil {
-            EmptyLibraryView { showImporter = true }
+            EmptyLibraryView(
+                importAction: { showImporter = true },
+                addSampleAction: { addSampleTapped() },
+                isAddingSample: isAddingSample
+            )
         } else {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
@@ -300,6 +315,38 @@ struct LibraryView: View {
             }
         }
     }
+
+    private func addSampleTapped() {
+        guard !isAddingSample else { return }
+        if library.containsBundledSample(filename: BundledSample.filename, title: BundledSample.title) {
+            sampleAlreadyPresent = true
+            return
+        }
+        isAddingSample = true
+        Task {
+            defer { isAddingSample = false }
+            await copyBundledSampleIntoLibrary()
+        }
+    }
+
+    /// Copies the bundled file to a temp URL and imports it through `handleIncomingURLs`.
+    private func copyBundledSampleIntoLibrary() async {
+        guard let bundled = BundledSample.bundledURL() else {
+            library.importError = "The sample book is missing from the app."
+            return
+        }
+        let destination = FileManager.default.temporaryDirectory.appendingPathComponent(BundledSample.filename)
+        do {
+            if FileManager.default.fileExists(atPath: destination.path) {
+                try FileManager.default.removeItem(at: destination)
+            }
+            try FileManager.default.copyItem(at: bundled, to: destination)
+        } catch {
+            library.importError = error.localizedDescription
+            return
+        }
+        await library.handleIncomingURLs([destination])
+    }
 }
 
 struct LibraryGridItem: View {
@@ -375,18 +422,50 @@ struct LibraryListItem: View {
     }
 }
 
+/// LibriVox public-domain reading: https://archive.org/download/raven/the_raven_librivox.m4b
+enum BundledSample {
+    static let resourceName = "TheRaven"
+    static let fileExtension = "m4b"
+    static let filename = "TheRaven.m4b"
+    static let title = "The Raven"
+
+    static func bundledURL(in bundle: Bundle = .main) -> URL? {
+        let subdirectories: [String?] = ["Resources/Sample", "Sample", nil]
+        for subdirectory in subdirectories {
+            if let url = bundle.url(
+                forResource: resourceName,
+                withExtension: fileExtension,
+                subdirectory: subdirectory
+            ) {
+                return url
+            }
+        }
+        return nil
+    }
+}
+
 struct EmptyLibraryView: View {
     var importAction: () -> Void
+    var addSampleAction: () -> Void
+    var isAddingSample: Bool
 
     var body: some View {
         ContentUnavailableView {
             Label("No books yet", systemImage: "books.vertical")
         } description: {
-            Text("AirDrop an .m4b, pick one from Files, or share a file into Chapterline. DRM-free only — Audible .aa / .aax won’t import.")
+            Text("AirDrop an .m4b, pick one from Files, share a file into Chapterline, or tap Add sample. DRM-free only — Audible .aa / .aax won’t import.")
         } actions: {
-            Button("Import from Files", action: importAction)
-                .buttonStyle(.borderedProminent)
-                .controlSize(.large)
+            VStack(spacing: 12) {
+                Button("Import from Files", action: importAction)
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.large)
+                Button("Add sample", action: addSampleAction)
+                    .buttonStyle(.bordered)
+                    .controlSize(.large)
+                    .frame(minHeight: 44)
+                    .disabled(isAddingSample)
+                    .accessibilityLabel("Add sample book")
+            }
         }
     }
 }

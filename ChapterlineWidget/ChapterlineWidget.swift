@@ -95,7 +95,7 @@ struct ChapterlineWidget: Widget {
             ChapterlineWidgetEntryView(entry: entry)
         }
         .configurationDisplayName("Now Playing")
-        .description("Cover, title, and play/pause for the current book.")
+        .description("Title, chapter, author, and play/pause for the current book.")
         .supportedFamilies([.systemSmall, .systemMedium])
     }
 }

@@ -10,12 +10,12 @@ Build number source of truth: Xcode CURRENT_PROJECT_VERSION (integer, monotonic)
 
 ## Current
 
-- Marketing: 1.4.0
-- Build: 6
+- Marketing: 1.4.1
+- Build: 7
 - Channel: App Store prep
 - Date: 2026-10-07
-- Git: feature/now-playing-bar-1.4.0 (bnb549/Chapterline)
-- App, share extension, and widget all ship as 1.4.0 (6)
+- Git: fix/app-review-sample-1.4.1 (bnb549/Chapterline)
+- App, share extension, and widget all ship as 1.4.1 (7)
 
 ## SemVer rules
 
@@ -25,6 +25,15 @@ Build number source of truth: Xcode CURRENT_PROJECT_VERSION (integer, monotonic)
 - Build number: increment on every archive / TestFlight upload, even if marketing version is unchanged
 
 ## History
+
+### 1.4.1 — 2026-10-07 — build 7
+
+- PATCH. App Review can add a bundled public-domain reading of “The Raven” from the empty library. The share sheet, document types, and widget gallery stop claiming things the app does not do.
+- Add sample copies `Chapterline/Resources/Sample/TheRaven.m4b` through `LibraryStore.handleIncomingURLs`. A second tap does not insert another copy.
+- Share extension activates only for m4b, m4a, mp3, aac, flac, and zip. Unrecognized attachments are skipped.
+- `LSHandlerRank` is Alternate. `public.audio` is no longer a document type.
+- Widget gallery text is “Title, chapter, author, and play/pause for the current book.”
+- Files touched: LibraryView.swift, LibraryStore.swift, Chapterline-Info.plist, ChapterlineShare/Info.plist, ShareViewController.swift, ShareImportAllowlist.swift, ChapterlineWidget.swift, project.pbxproj, APP_REVIEW_NOTES.md, CHANGELOG.md, VERSION.md, ChapterlineTests.
 
 ### 1.4.0 — 2026-10-07 — build 6
 

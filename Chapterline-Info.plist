@@ -10,14 +10,13 @@
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 			<key>LSHandlerRank</key>
-			<string>Owner</string>
+			<string>Alternate</string>
 			<key>LSItemContentTypes</key>
 			<array>
 				<string>com.apple.m4b-audio</string>
 				<string>public.mpeg-4-audio</string>
 				<string>public.mp3</string>
 				<string>public.aac-audio</string>
-				<string>public.audio</string>
 				<string>org.xiph.flac</string>
 				<string>public.zip-archive</string>
 			</array>

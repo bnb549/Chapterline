@@ -5,6 +5,15 @@ All notable changes to Chapterline are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions follow the marketing labels used in recent commits (`v1.1`, `v1.2`, `v1.3`).
 
+## [1.4.1] — 2026-10-07
+
+### Fixed
+
+* An empty library has an Add sample button that copies a bundled public-domain reading of “The Raven” through the existing import path, so review can play a book with no account and no network.
+* The share extension opens only for m4b, m4a, mp3, aac, flac, and zip. A photo or PDF does not offer Chapterline, and unrecognized bytes are not saved as a book.
+* Document types use handler rank Alternate and no longer claim `public.audio`.
+* The widget gallery description matches the widget: title, chapter, author, and play/pause.
+
 ## [1.4.0] — 2026-10-07
 
 ### Added

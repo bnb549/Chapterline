@@ -14,11 +14,22 @@
 		<string>$(PRODUCT_MODULE_NAME).ShareViewController</string>
 		<key>NSExtensionAttributes</key>
 		<dict>
+			<!-- ShareImportAllowlist is the same six UTIs. This predicate is the share-sheet gate. -->
 			<key>NSExtensionActivationRule</key>
-			<dict>
-				<key>NSExtensionActivationSupportsFileWithMaxCount</key>
-				<integer>20</integer>
-			</dict>
+			<string>SUBQUERY(
+  extensionItems,
+  $extensionItem,
+  SUBQUERY(
+    $extensionItem.attachments,
+    $attachment,
+    ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.mpeg-4-audio"
+    OR ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.mp3"
+    OR ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.aac-audio"
+    OR ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.zip-archive"
+    OR ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "org.xiph.flac"
+    OR ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "com.apple.m4b-audio"
+  ).@count &gt;= 1
+).@count &gt;= 1</string>
 		</dict>
 	</dict>
 </dict>

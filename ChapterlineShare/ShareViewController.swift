@@ -18,6 +18,8 @@ final class ShareViewController: UIViewController {
         Task { await copyAttachments() }
     }
 
+    /// Info.plist `NSExtensionActivationRule` is the share-sheet gate.
+    /// `ShareImportAllowlist` applies that same list again and caps one share at 20 files.
     private func copyAttachments() async {
         guard let inbox = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.benmonroe.ChapterLine")?
             .appendingPathComponent("Inbox", isDirectory: true) else {
@@ -30,25 +32,26 @@ final class ShareViewController: UIViewController {
         var copied = 0
         for item in items {
             for provider in item.attachments ?? [] {
-                if let url = await loadURL(from: provider) {
-                    let dest = inbox.appendingPathComponent(uniqueName(url.lastPathComponent, in: inbox))
-                    do {
-                        if url.startAccessingSecurityScopedResource() {
-                            defer { url.stopAccessingSecurityScopedResource() }
-                            try FileManager.default.copyItem(at: url, to: dest)
-                        } else {
-                            try FileManager.default.copyItem(at: url, to: dest)
-                        }
-                        copied += 1
-                    } catch {
-                        continue
+                if copied >= ShareImportAllowlist.maxAttachmentCount { break }
+                guard let url = await loadFileURL(from: provider) else { continue }
+                guard ShareImportAllowlist.allowsFile(
+                    typeIdentifiers: provider.registeredTypeIdentifiers,
+                    pathExtension: url.pathExtension
+                ) else { continue }
+                let dest = inbox.appendingPathComponent(uniqueName(url.lastPathComponent, in: inbox))
+                do {
+                    if url.startAccessingSecurityScopedResource() {
+                        defer { url.stopAccessingSecurityScopedResource() }
+                        try FileManager.default.copyItem(at: url, to: dest)
+                    } else {
+                        try FileManager.default.copyItem(at: url, to: dest)
                     }
-                } else if let data = await loadData(from: provider) {
-                    let dest = inbox.appendingPathComponent("share-\(UUID().uuidString).m4b")
-                    try? data.write(to: dest)
                     copied += 1
+                } catch {
+                    continue
                 }
             }
+            if copied >= ShareImportAllowlist.maxAttachmentCount { break }
         }
 
         let notification = CFNotificationCenterGetDarwinNotifyCenter()
@@ -68,31 +71,39 @@ final class ShareViewController: UIViewController {
         return candidate
     }
 
-    private func loadURL(from provider: NSItemProvider) async -> URL? {
-        let types = [UTType.fileURL.identifier, UTType.audiovisualContent.identifier, "public.file-url"]
-        for type in types where provider.hasItemConformingToTypeIdentifier(type) {
-            let loaded = await withCheckedContinuation { continuation in
-                provider.loadItem(forTypeIdentifier: type, options: nil) { item, _ in
-                    continuation.resume(returning: item)
-                }
-            }
-            if let url = loaded as? URL {
+    /// File URLs only. Unrecognized bytes are skipped, not written out as a book.
+    private func loadFileURL(from provider: NSItemProvider) async -> URL? {
+        let fileURLTypes = [UTType.fileURL.identifier, "public.file-url"]
+        for type in fileURLTypes where provider.hasItemConformingToTypeIdentifier(type) {
+            if let url = await loadURLItem(from: provider, typeIdentifier: type, acceptBookmarkData: true) {
                 return url
             }
-            if let data = loaded as? Data, let url = URL(dataRepresentation: data, relativeTo: nil) {
+        }
+        for type in ShareImportAllowlist.typeIdentifiers where provider.hasItemConformingToTypeIdentifier(type) {
+            if let url = await loadURLItem(from: provider, typeIdentifier: type, acceptBookmarkData: false) {
                 return url
             }
         }
         return nil
     }
 
-    private func loadData(from provider: NSItemProvider) async -> Data? {
-        guard provider.hasItemConformingToTypeIdentifier(UTType.data.identifier) else { return nil }
-        return await withCheckedContinuation { continuation in
-            provider.loadDataRepresentation(forTypeIdentifier: UTType.data.identifier) { data, _ in
-                continuation.resume(returning: data)
+    private func loadURLItem(
+        from provider: NSItemProvider,
+        typeIdentifier: String,
+        acceptBookmarkData: Bool
+    ) async -> URL? {
+        let loaded = await withCheckedContinuation { continuation in
+            provider.loadItem(forTypeIdentifier: typeIdentifier, options: nil) { item, _ in
+                continuation.resume(returning: item)
             }
         }
+        if let url = loaded as? URL {
+            return url
+        }
+        if acceptBookmarkData, let data = loaded as? Data, let url = URL(dataRepresentation: data, relativeTo: nil) {
+            return url
+        }
+        return nil
     }
 
     private func finish(cancelled: Bool) {

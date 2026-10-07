@@ -207,6 +207,32 @@ final class LibraryStore {
         await importFiles(scoped)
     }
 
+    /// The bundled sample is already in the library when a live book has the same
+    /// filename and title, or a live BookIdentity whose source signature is that file.
+    func containsBundledSample(filename: String, title: String) -> Bool {
+        let wantedName = BookIdentityMath.normalizedFilename(filename)
+        func sameFile(_ name: String) -> Bool {
+            BookIdentityMath.normalizedFilename((name as NSString).lastPathComponent) == wantedName
+        }
+        func sameTitle(_ value: String) -> Bool {
+            value.localizedCaseInsensitiveCompare(title) == .orderedSame
+        }
+        if books.contains(where: { book in
+            let names = [book.sourceFilename] + book.sortedFiles.map(\.relativePath)
+            return names.contains(where: sameFile) && sameTitle(book.title)
+        }) {
+            return true
+        }
+        let liveIDs = Set(books.map(\.id))
+        let identities = (try? context.fetch(FetchDescriptor<BookIdentity>())) ?? []
+        return identities.contains { identity in
+            guard liveIDs.contains(identity.bookID) else { return false }
+            return identity.sourceSignature
+                .split(separator: "\n")
+                .contains { sameFile(String($0)) }
+        }
+    }
+
     func drainShareInbox() async {
         guard let inbox = AppGroup.ensureInbox() else { return }
         let contents = (try? FileManager.default.contentsOfDirectory(at: inbox, includingPropertiesForKeys: nil)) ?? []
