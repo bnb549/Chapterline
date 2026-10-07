@@ -85,6 +85,15 @@ final class PlayerController {
         scheduleStaleChapterRescan(for: book.id)
     }
 
+    /// Player UI hook. Skip `engine.load` when this book is already playing so the
+    /// live session is not rebuilt, seeked, or restarted. A paused book still loads.
+    func loadIfNeeded(book: Book) async {
+        if loadedBookID == book.id, snapshot.isPlaying {
+            return
+        }
+        await load(book: book)
+    }
+
     /// Push a chapter reload into a book that is already loaded, without seeking.
     func refreshLoadedChapters(bookID: UUID) async {
         guard loadedBookID == bookID, let book = AppRuntime.library?.book(id: bookID) else { return }

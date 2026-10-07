@@ -37,6 +37,10 @@ struct BookPlayerView: View {
         .sheet(isPresented: $showSleep) { SleepTimerSheet() }
         .sheet(isPresented: $showSpeed) { SpeedSheet() }
         .sheet(isPresented: $showEdit) { if let book { EditMetadataView(book: book) } }
+        .onAppear {
+            guard let book else { return }
+            Task { await player.loadIfNeeded(book: book) }
+        }
     }
 
     private func playerPage(_ book: Book) -> some View {

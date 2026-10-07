@@ -1,5 +1,9 @@
 import SwiftUI
 
+private struct PresentedBook: Identifiable {
+    let id: UUID
+}
+
 struct RootView: View {
     @Environment(SettingsStore.self) private var settings
     @Environment(LibraryStore.self) private var library
@@ -7,16 +11,26 @@ struct RootView: View {
     @Environment(ListeningStatsStore.self) private var stats
     @Environment(\.scenePhase) private var scenePhase
 
+    @State private var libraryPlayerPushed = false
+    @State private var statsPlayerPushed = false
+    @State private var presentedPlayer: PresentedBook?
+    @State private var nowPlayingBarHeight: CGFloat = 0
+
     var body: some View {
         TabView {
-            LibraryView()
+            LibraryView(showsPushedPlayer: $libraryPlayerPushed)
+                .nowPlayingBar(visible: showsNowPlayingBar(playerPushed: libraryPlayerPushed), onOpen: presentNowPlaying)
                 .tabItem { Label("Library", systemImage: "books.vertical") }
-            StatsView()
+            StatsView(showsPushedPlayer: $statsPlayerPushed)
+                .nowPlayingBar(visible: showsNowPlayingBar(playerPushed: statsPlayerPushed), onOpen: presentNowPlaying)
                 .tabItem { Label("Stats", systemImage: "chart.bar") }
             SettingsView()
+                .nowPlayingBar(visible: showsNowPlayingBar(playerPushed: false), onOpen: presentNowPlaying)
                 .tabItem { Label("Settings", systemImage: "gearshape") }
         }
         .tint(Color.accentColor)
+        .environment(\.nowPlayingClearance, nowPlayingBarHeight)
+        .onPreferenceChange(NowPlayingBarHeightKey.self) { nowPlayingBarHeight = $0 }
         .preferredColorScheme(settings.preferredColorScheme)
         .toolbarBackground(settings.usesTrueBlack ? Color.black : Color.clear, for: .tabBar)
         .toolbarBackground(settings.usesTrueBlack ? .visible : .automatic, for: .tabBar)
@@ -45,6 +59,20 @@ struct RootView: View {
         .onOpenURL { url in
             handleOpenURL(url)
         }
+        .fullScreenCover(item: $presentedPlayer) { presented in
+            NowPlayingPlayerCover(bookID: presented.id)
+        }
+    }
+
+    private func showsNowPlayingBar(playerPushed: Bool) -> Bool {
+        NowPlayingChrome.isListening(player.snapshot) && presentedPlayer == nil && !playerPushed
+    }
+
+    private func presentNowPlaying() {
+        guard presentedPlayer == nil,
+              let id = player.snapshot.bookID,
+              library.book(id: id) != nil else { return }
+        presentedPlayer = PresentedBook(id: id)
     }
 
     private func handleOpenURL(_ url: URL) {

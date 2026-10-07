@@ -4,6 +4,7 @@ struct SettingsView: View {
     @Environment(SettingsStore.self) private var settings
     @Environment(PlayerController.self) private var player
     @Environment(ListeningStatsStore.self) private var stats
+    @Environment(\.nowPlayingClearance) private var nowPlayingClearance
     @State private var confirmDeleteStats = false
 
     var body: some View {
@@ -18,6 +19,7 @@ struct SettingsView: View {
                     aboutSection
                 }
                 .scrollContentBackground(.hidden)
+                .contentMargins(.bottom, nowPlayingClearance, for: .scrollContent)
             }
             .navigationTitle("Settings")
             .toolbarBackground(settings.usesTrueBlack ? Color.black : Color.clear, for: .navigationBar)
