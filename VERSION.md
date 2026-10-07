@@ -10,12 +10,12 @@ Build number source of truth: Xcode CURRENT_PROJECT_VERSION (integer, monotonic)
 
 ## Current
 
-- Marketing: 1.3.2
-- Build: 5
+- Marketing: 1.4.0
+- Build: 6
 - Channel: App Store prep
-- Date: 2026-10-05
-- Git: fix/qt-text-track-1.3.2 (bnb549/Chapterline) — apply after 1.3.1
-- App, share extension, and widget all ship as 1.3.2 (5)
+- Date: 2026-10-07
+- Git: feature/now-playing-bar-1.4.0 (bnb549/Chapterline)
+- App, share extension, and widget all ship as 1.4.0 (6)
 
 ## SemVer rules
 
@@ -25,6 +25,13 @@ Build number source of truth: Xcode CURRENT_PROJECT_VERSION (integer, monotonic)
 - Build number: increment on every archive / TestFlight upload, even if marketing version is unchanged
 
 ## History
+
+### 1.4.0 — 2026-10-07 — build 6
+
+- MINOR. While a book is playing, the Library Continue Listening card hides and a Now Playing bar sits above the Library / Stats / Settings tab bar.
+- Bar shows cover, title, and chapter or remaining time. Tap opens the existing player without restarting playback. Pause on the bar does not open the player.
+- Known limits: the bar is absent while paused; resume stays on Continue Listening. No skip or scrub on the bar. Lock Screen is unchanged.
+- Files touched: LibraryView.swift, StatsView.swift, SettingsView.swift, RootView.swift, NowPlayingBar.swift, BookPlayerView.swift, PlayerController.swift, project.pbxproj, CHANGELOG.md, VERSION.md.
 
 ### 1.3.2 — 2026-10-05 — build 5
 

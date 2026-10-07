@@ -2,9 +2,16 @@ import SwiftData
 import SwiftUI
 
 struct LibraryView: View {
+    @Binding var showsPushedPlayer: Bool
+
     @Environment(LibraryStore.self) private var library
     @Environment(SettingsStore.self) private var settings
     @Environment(PlayerController.self) private var player
+    @Environment(\.nowPlayingClearance) private var nowPlayingClearance
+
+    init(showsPushedPlayer: Binding<Bool> = .constant(false)) {
+        _showsPushedPlayer = showsPushedPlayer
+    }
 
     @State private var search = ""
     @State private var showImporter = false
@@ -36,11 +43,8 @@ struct LibraryView: View {
             .searchable(text: $search, prompt: "Title, author, filename")
             .toolbar { toolbar }
             .navigationDestination(for: UUID.self) { id in
-                if let book = library.book(id: id) {
+                if library.book(id: id) != nil {
                     BookPlayerView(bookID: id)
-                        .onAppear {
-                            Task { await player.load(book: book) }
-                        }
                 }
             }
             .sheet(isPresented: $showImporter) {
@@ -112,6 +116,10 @@ struct LibraryView: View {
             .alert("Couldn’t read chapters", isPresented: $chapterReloadFailed) {
                 Button("OK", role: .cancel) {}
             }
+            .onAppear { showsPushedPlayer = !path.isEmpty }
+            .onChange(of: path.count) { _, count in
+                showsPushedPlayer = count > 0
+            }
         }
     }
 
@@ -122,7 +130,8 @@ struct LibraryView: View {
         } else {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    if search.isEmpty, selectedFolder == nil, let current = library.continueListening {
+                    if search.isEmpty, selectedFolder == nil, let current = library.continueListening,
+                       !NowPlayingChrome.isListening(player.snapshot) {
                         ContinueListeningHeader(book: current) {
                             path.append(current.id)
                         }
@@ -141,6 +150,7 @@ struct LibraryView: View {
                 }
                 .padding(.bottom, 24)
             }
+            .contentMargins(.bottom, nowPlayingClearance, for: .scrollContent)
         }
     }
 

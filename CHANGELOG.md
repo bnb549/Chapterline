@@ -5,6 +5,15 @@ All notable changes to Chapterline are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions follow the marketing labels used in recent commits (`v1.1`, `v1.2`, `v1.3`).
 
+## [1.4.0] — 2026-10-07
+
+### Added
+
+* While a book is playing, the Library Continue Listening card hides and a Now Playing bar sits above the Library, Stats, and Settings tab bar.
+* The bar shows the cover, title, and chapter or remaining time. Tap opens the existing player without restarting playback. Pause on the bar does not open the player.
+
+The bar is absent while playback is paused. Resume stays on Continue Listening. The bar has no skip or scrub. Lock Screen is unchanged.
+
 ## [1.3.2] — 2026-09-30
 
 ### Fixed

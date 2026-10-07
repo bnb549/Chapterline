@@ -1,10 +1,16 @@
 import SwiftUI
 
 struct StatsView: View {
+    @Binding var showsPushedPlayer: Bool
+
     @Environment(ListeningStatsStore.self) private var stats
     @Environment(LibraryStore.self) private var library
     @Environment(SettingsStore.self) private var settings
-    @Environment(PlayerController.self) private var player
+    @Environment(\.nowPlayingClearance) private var nowPlayingClearance
+
+    init(showsPushedPlayer: Binding<Bool> = .constant(false)) {
+        _showsPushedPlayer = showsPushedPlayer
+    }
 
     @State private var path = NavigationPath()
 
@@ -26,24 +32,28 @@ struct StatsView: View {
                     .padding(.horizontal)
                     .padding(.bottom, 28)
                 }
+                .contentMargins(.bottom, nowPlayingClearance, for: .scrollContent)
             }
             .navigationTitle("Stats")
             .navigationBarTitleDisplayMode(.large)
             .toolbarBackground(settings.usesTrueBlack ? Color.black : Color.clear, for: .navigationBar)
             .toolbarBackground(settings.usesTrueBlack ? .visible : .automatic, for: .navigationBar)
             .navigationDestination(for: UUID.self) { id in
-                if let book = library.book(id: id) {
+                if library.book(id: id) != nil {
                     BookPlayerView(bookID: id)
-                        .onAppear {
-                            Task { await player.load(book: book) }
-                        }
                 } else {
                     ContentUnavailableView("Book missing", systemImage: "book.closed")
                 }
             }
-            .onAppear { stats.refresh() }
+            .onAppear {
+                stats.refresh()
+                showsPushedPlayer = !path.isEmpty
+            }
             .onChange(of: library.books.count) { _, _ in
                 stats.refresh()
+            }
+            .onChange(of: path.count) { _, count in
+                showsPushedPlayer = count > 0
             }
         }
     }
