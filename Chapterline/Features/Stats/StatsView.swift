@@ -13,6 +13,9 @@ struct StatsView: View {
     }
 
     @State private var path = NavigationPath()
+    @State private var showsEarlierSessions = false
+
+    private let visibleSessionLimit = 3
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -214,18 +217,40 @@ struct StatsView: View {
     }
 
     private var recentSessions: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        let sessions = stats.recentSessions
+        let visible = showsEarlierSessions ? sessions : Array(sessions.prefix(visibleSessionLimit))
+        let hiddenCount = sessions.count - visible.count
+        return VStack(alignment: .leading, spacing: 10) {
             Text("Recent sessions")
                 .font(.headline)
                 .foregroundStyle(Theme.textPrimary)
-            if stats.recentSessions.isEmpty {
+            if sessions.isEmpty {
                 Text("Sessions longer than 15 seconds show up here.")
                     .font(.footnote)
                     .foregroundStyle(Theme.textSecondary)
                     .padding(.vertical, 8)
             } else {
-                ForEach(stats.recentSessions) { session in
+                ForEach(visible) { session in
                     sessionRow(session)
+                }
+                if sessions.count > visibleSessionLimit {
+                    Button {
+                        showsEarlierSessions.toggle()
+                    } label: {
+                        HStack(spacing: 6) {
+                            Text(showsEarlierSessions
+                                 ? "Hide earlier sessions"
+                                 : "Show \(hiddenCount) earlier \(hiddenCount == 1 ? "session" : "sessions")")
+                            Image(systemName: showsEarlierSessions ? "chevron.up" : "chevron.down")
+                                .font(.caption.weight(.semibold))
+                        }
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Color.accentColor)
+                        .frame(maxWidth: .infinity, minHeight: 44)
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(SessionDisclosureButtonStyle())
+                    .accessibilityHint(showsEarlierSessions ? "Collapses older sessions" : "Shows older sessions")
                 }
             }
         }
@@ -285,6 +310,16 @@ struct StatsView: View {
         return "\(session.title), \(time), \(rate), \(when)\(missing)"
     }
 
+}
+
+/// Plain buttons size themselves to the label text. This keeps the
+/// earlier-sessions control at a 44pt tap target.
+private struct SessionDisclosureButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .frame(maxWidth: .infinity, minHeight: 44)
+            .contentShape(Rectangle())
+    }
 }
 
 #if DEBUG
