@@ -9,10 +9,14 @@ Versions follow the marketing labels used in recent commits (`v1.1`, `v1.2`, `v1
 
 ### Added
 
-* While a book is playing, the Library Continue Listening card hides and a Now Playing bar sits above the Library, Stats, and Settings tab bar.
-* The bar shows the cover, title, and chapter or remaining time. Tap opens the existing player without restarting playback. Pause on the bar does not open the player.
+* A Now Playing bar sits above the Library, Stats, and Settings tab bar while a book is playing or can be resumed.
+* The bar shows the cover, title, and chapter or remaining time. Tap opens the existing player without restarting playback. Play resumes and Pause pauses without opening the player.
 
-The bar is absent while playback is paused. Resume stays on Continue Listening. The bar has no skip or scrub. Lock Screen is unchanged.
+### Changed
+
+* The Library Continue Listening card is removed. Resume lives on the Now Playing bar, including while playback is paused.
+
+The bar has no skip or scrub. Lock Screen is unchanged. The bar hides while the player is on screen.
 
 ## [1.3.2] — 2026-09-30
 

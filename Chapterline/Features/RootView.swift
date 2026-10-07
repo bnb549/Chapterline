@@ -64,14 +64,27 @@ struct RootView: View {
         }
     }
 
+    private var nowPlayingContent: NowPlayingChrome.Content? {
+        let snapshot = player.snapshot
+        let finished: Bool? = {
+            guard let id = snapshot.bookID else { return nil }
+            return library.book(id: id)?.isFinished
+        }()
+        guard let content = NowPlayingChrome.barContent(
+            snapshotBookID: snapshot.bookID,
+            isPlaying: snapshot.isPlaying,
+            loadedBookIsFinished: finished,
+            continueBookID: library.continueListening?.id
+        ), library.book(id: content.bookID) != nil else { return nil }
+        return content
+    }
+
     private func showsNowPlayingBar(playerPushed: Bool) -> Bool {
-        NowPlayingChrome.isListening(player.snapshot) && presentedPlayer == nil && !playerPushed
+        nowPlayingContent != nil && presentedPlayer == nil && !playerPushed
     }
 
     private func presentNowPlaying() {
-        guard presentedPlayer == nil,
-              let id = player.snapshot.bookID,
-              library.book(id: id) != nil else { return }
+        guard presentedPlayer == nil, let id = nowPlayingContent?.bookID else { return }
         presentedPlayer = PresentedBook(id: id)
     }
 

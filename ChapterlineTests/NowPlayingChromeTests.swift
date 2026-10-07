@@ -16,6 +16,83 @@ final class NowPlayingChromeTests: XCTestCase {
         XCTAssertFalse(NowPlayingChrome.isListening(snap))
     }
 
+    func testBarPrefersThePlayingBook() {
+        let playing = UUID()
+        let other = UUID()
+        let content = NowPlayingChrome.barContent(
+            snapshotBookID: playing,
+            isPlaying: true,
+            loadedBookIsFinished: false,
+            continueBookID: other
+        )
+        XCTAssertEqual(content, NowPlayingChrome.Content(bookID: playing, isPlaying: true))
+    }
+
+    func testBarKeepsAPausedUnfinishedBook() {
+        let session = UUID()
+        let other = UUID()
+        let content = NowPlayingChrome.barContent(
+            snapshotBookID: session,
+            isPlaying: false,
+            loadedBookIsFinished: false,
+            continueBookID: other
+        )
+        XCTAssertEqual(content, NowPlayingChrome.Content(bookID: session, isPlaying: false))
+    }
+
+    func testFinishedOrMissingLoadedBookFallsThroughToContinue() {
+        let finished = UUID()
+        let resume = UUID()
+        XCTAssertEqual(
+            NowPlayingChrome.barContent(
+                snapshotBookID: finished,
+                isPlaying: false,
+                loadedBookIsFinished: true,
+                continueBookID: resume
+            ),
+            NowPlayingChrome.Content(bookID: resume, isPlaying: false)
+        )
+        XCTAssertEqual(
+            NowPlayingChrome.barContent(
+                snapshotBookID: finished,
+                isPlaying: false,
+                loadedBookIsFinished: nil,
+                continueBookID: resume
+            ),
+            NowPlayingChrome.Content(bookID: resume, isPlaying: false)
+        )
+    }
+
+    func testColdStartUsesContinueBook() {
+        let resume = UUID()
+        let content = NowPlayingChrome.barContent(
+            snapshotBookID: nil,
+            isPlaying: false,
+            loadedBookIsFinished: nil,
+            continueBookID: resume
+        )
+        XCTAssertEqual(content, NowPlayingChrome.Content(bookID: resume, isPlaying: false))
+    }
+
+    func testBarHidesWhenNothingCanResume() {
+        XCTAssertNil(
+            NowPlayingChrome.barContent(
+                snapshotBookID: nil,
+                isPlaying: false,
+                loadedBookIsFinished: nil,
+                continueBookID: nil
+            )
+        )
+        XCTAssertNil(
+            NowPlayingChrome.barContent(
+                snapshotBookID: UUID(),
+                isPlaying: false,
+                loadedBookIsFinished: true,
+                continueBookID: nil
+            )
+        )
+    }
+
     func testDetailPrefersChapterThenRemainingRules() {
         XCTAssertEqual(
             NowPlayingChrome.detailLine(

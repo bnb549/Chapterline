@@ -130,13 +130,6 @@ struct LibraryView: View {
         } else {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    if search.isEmpty, selectedFolder == nil, let current = library.continueListening,
-                       !NowPlayingChrome.isListening(player.snapshot) {
-                        ContinueListeningHeader(book: current) {
-                            path.append(current.id)
-                        }
-                        .padding(.horizontal)
-                    }
                     folderChips
                     if visibleBooks.isEmpty {
                         ContentUnavailableView.search(text: search)
@@ -379,50 +372,6 @@ struct LibraryListItem: View {
         .accessibilityValue(settings.hideRemainingTime
             ? "\(Int((book.progress * 100).rounded())) percent"
             : TimeMath.formatRemaining(duration: book.duration, position: book.position, rate: book.playbackRate))
-    }
-}
-
-struct ContinueListeningHeader: View {
-    let book: Book
-    var action: () -> Void
-    @Environment(SettingsStore.self) private var settings
-
-    var body: some View {
-        Button(action: action) {
-            HStack(spacing: 14) {
-                CoverView(book: book, cornerRadius: 8)
-                    .frame(width: 72, height: 72)
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Continue Listening")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(Color.accentColor)
-                    Text(book.title)
-                        .font(.headline)
-                        .foregroundStyle(Theme.textPrimary)
-                        .lineLimit(1)
-                    if let chapter = book.currentChapter {
-                        Text(chapter.title)
-                            .font(.subheadline)
-                            .foregroundStyle(Theme.textSecondary)
-                            .lineLimit(1)
-                    }
-                    RemainingLabel(book: book)
-                        .font(.caption)
-                        .foregroundStyle(Theme.textTertiary)
-                }
-                Spacer()
-                Image(systemName: "play.fill")
-                    .font(.title3)
-                    .foregroundStyle(.white)
-                    .frame(width: 52, height: 52)
-                    .background(Color.accentColor, in: Circle())
-            }
-            .padding(14)
-            .background(Theme.chromeBackground(oled: settings.usesTrueBlack), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel("Continue listening to \(book.title)")
-        .accessibilityHint("Opens the player")
     }
 }
 

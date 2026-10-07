@@ -158,6 +158,15 @@ final class PlayerController {
         await play()
     }
 
+    /// Resume one book from the Now Playing bar. Reloads only when it is not already loaded,
+    /// so a paused session is not seeked back to the stored position.
+    func resume(_ book: Book) async {
+        if loadedBookID != book.id {
+            await load(book: book)
+        }
+        await play()
+    }
+
     func persistNow() {
         persistIfNeeded(snapshot, force: true)
     }

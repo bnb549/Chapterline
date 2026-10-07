@@ -28,9 +28,10 @@ Build number source of truth: Xcode CURRENT_PROJECT_VERSION (integer, monotonic)
 
 ### 1.4.0 — 2026-10-07 — build 6
 
-- MINOR. While a book is playing, the Library Continue Listening card hides and a Now Playing bar sits above the Library / Stats / Settings tab bar.
-- Bar shows cover, title, and chapter or remaining time. Tap opens the existing player without restarting playback. Pause on the bar does not open the player.
-- Known limits: the bar is absent while paused; resume stays on Continue Listening. No skip or scrub on the bar. Lock Screen is unchanged.
+- MINOR. A Now Playing bar sits above the Library / Stats / Settings tab bar for the book that is playing or the unfinished book you can resume.
+- The Library Continue Listening card is removed. Play on the bar resumes that book without opening the player. Pause pauses without opening it. A tap on the bar opens the existing player without restarting playback.
+- The caption is Now Playing while audio is running and Continue Listening while paused. The bar shows cover, title, and chapter or remaining time.
+- Known limits: no skip or scrub on the bar. Lock Screen is unchanged. The bar hides while the player is on screen.
 - Files touched: LibraryView.swift, StatsView.swift, SettingsView.swift, RootView.swift, NowPlayingBar.swift, BookPlayerView.swift, PlayerController.swift, project.pbxproj, CHANGELOG.md, VERSION.md.
 
 ### 1.3.2 — 2026-10-05 — build 5
