@@ -5,7 +5,8 @@
 No account. No store. No ads. Offline first. Every file is a book.
 
 Chapterline plays the audiobooks you already own. Import a file, pick up where you left off, jump chapters, bookmark a line, and keep listening from the Lock Screen. It is not a music player and it is not a catalog. Your library lives on the device.
-
+## IOS Beta Testing 
+https://testflight.apple.com/join/bQdjgX2k
 ## What it does
 
 - Plays DRM-free audiobooks on iPhone (iOS 17+)
