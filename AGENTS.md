@@ -29,7 +29,7 @@ No ViewModels folder. Views talk to `@Observable` stores via `Environment`. Do n
 | `PlayerController` | MainActor snapshot of the player for UI | file I/O |
 | `NowPlayingBridge` | `MPNowPlayingInfoCenter` + `MPRemoteCommandCenter` | library mutations except position-save callback |
 | `ImportPipeline` | Files / share / zip / folder-of-files → Book | UI layout |
-| `SettingsStore` | skip, speed, rewind, fade, boost, appearance, hide remaining | per-book position |
+| `SettingsStore` | skip, speed, rewind, fade, boost, appearance, accent color, hide remaining | per-book position |
 
 `AppRuntime` is the process-wide handle so App Intents and the widget URL path can reach the same stores. Set it in `ChapterlineApp.init`.
 
@@ -72,7 +72,7 @@ No ViewModels folder. Views talk to `@Observable` stores via `Environment`. Do n
 ## UI
 
 - Dark is the default. Cover-tinted player chrome is fine. Launch screen follows system light/dark so it does not flash against the chosen theme.
-- Appearance: system / light / dark / OLED (true black).
+- Appearance: system / light / dark / OLED (true black). Accent color is user-choosable (presets + custom); widget follows via App Group.
 - Book detail and player are **one page**. Do not add a separate Now Playing route.
 - Dynamic Type. VoiceOver labels on every control.
 

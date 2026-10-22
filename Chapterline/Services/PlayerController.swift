@@ -4,6 +4,7 @@ import Foundation
 import Observation
 import SwiftUI
 import UIKit
+import WidgetKit
 
 @Observable
 @MainActor
@@ -23,6 +24,13 @@ final class PlayerController {
     private let motion = CMMotionManager()
     private var lastShakeAt = Date.distantPast
     var shakeToExtend = true
+
+    private var widgetCoverBookID: UUID?
+    private var widgetCoverImageID: ObjectIdentifier?
+    private var widgetCoverFailed = false
+    private var didClearWidgetCover = false
+    private var widgetReloadKey: String?
+    private static let widgetCoverFilename = "cover.jpg"
 
     func start() {
         guard pollTask == nil else { return }
@@ -196,7 +204,10 @@ final class PlayerController {
     }
 
     private func writeWidgetSnapshot(_ snap: PlayerSnapshot) {
-        guard let url = AppGroup.snapshotURL else { return }
+        // `engine.load` can publish the incoming book before this controller stores
+        // its artwork. Wait until the ids match so the shared cover belongs to that book.
+        guard snap.bookID == loadedBookID, let url = AppGroup.snapshotURL else { return }
+        let hasCover = syncWidgetCover(for: snap)
         let payload = NowPlayingSnapshot(
             bookID: snap.bookID,
             title: snap.title,
@@ -206,11 +217,93 @@ final class PlayerController {
             position: snap.position,
             duration: snap.duration,
             rate: snap.rate,
-            coverRelativePath: snap.bookID.map { BookStorage.embeddedCoverName + ":" + $0.uuidString }
+            coverRelativePath: hasCover ? Self.widgetCoverFilename : nil
         )
         if let data = try? JSONEncoder().encode(payload) {
             try? data.write(to: url, options: .atomic)
         }
+        reloadWidgetTimelineIfNeeded(snap, hasCover: hasCover)
+    }
+
+    /// Downsamples the loaded artwork into the App Group once per book. Removes it when nothing is loaded.
+    private func syncWidgetCover(for snap: PlayerSnapshot) -> Bool {
+        guard let coverURL = AppGroup.containerURL?.appendingPathComponent(Self.widgetCoverFilename) else {
+            return false
+        }
+        guard let bookID = snap.bookID, let artwork else {
+            clearWidgetCover(at: coverURL)
+            return false
+        }
+        didClearWidgetCover = false
+        let imageID = ObjectIdentifier(artwork)
+        if widgetCoverBookID == bookID, widgetCoverImageID == imageID {
+            return !widgetCoverFailed
+        }
+        guard let data = Self.widgetThumbnailJPEG(from: artwork) else {
+            widgetCoverBookID = bookID
+            widgetCoverImageID = imageID
+            widgetCoverFailed = true
+            try? FileManager.default.removeItem(at: coverURL)
+            return false
+        }
+        do {
+            try data.write(to: coverURL, options: .atomic)
+            widgetCoverBookID = bookID
+            widgetCoverImageID = imageID
+            widgetCoverFailed = false
+            return true
+        } catch {
+            widgetCoverBookID = bookID
+            widgetCoverImageID = imageID
+            widgetCoverFailed = true
+            try? FileManager.default.removeItem(at: coverURL)
+            return false
+        }
+    }
+
+    private func clearWidgetCover(at url: URL) {
+        guard widgetCoverBookID != nil || widgetCoverImageID != nil || !didClearWidgetCover else { return }
+        widgetCoverBookID = nil
+        widgetCoverImageID = nil
+        widgetCoverFailed = false
+        if FileManager.default.fileExists(atPath: url.path) {
+            try? FileManager.default.removeItem(at: url)
+        }
+        didClearWidgetCover = true
+    }
+
+    private func reloadWidgetTimelineIfNeeded(_ snap: PlayerSnapshot, hasCover: Bool) {
+        let key = [
+            snap.bookID?.uuidString ?? "-",
+            snap.isPlaying ? "1" : "0",
+            snap.chapterTitle,
+            hasCover ? "1" : "0"
+        ].joined(separator: "|")
+        guard key != widgetReloadKey else { return }
+        widgetReloadKey = key
+        guard snap.bookID != nil else { return }
+        WidgetCenter.shared.reloadTimelines(ofKind: "ChapterlineWidget")
+    }
+
+    private static func widgetThumbnailJPEG(from image: UIImage, maxPixel: CGFloat = 480) -> Data? {
+        let pixelWidth = image.size.width * image.scale
+        let pixelHeight = image.size.height * image.scale
+        guard pixelWidth >= 1, pixelHeight >= 1 else { return nil }
+        let longest = max(pixelWidth, pixelHeight)
+        let ratio = longest > maxPixel ? maxPixel / longest : 1
+        let size = CGSize(
+            width: max(1, floor(pixelWidth * ratio)),
+            height: max(1, floor(pixelHeight * ratio))
+        )
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = 1
+        format.opaque = true
+        let renderer = UIGraphicsImageRenderer(size: size, format: format)
+        let scaled = renderer.image { context in
+            context.cgContext.interpolationQuality = .high
+            image.draw(in: CGRect(origin: .zero, size: size))
+        }
+        return scaled.jpegData(compressionQuality: 0.82)
     }
 
     private func startShakeMonitor() {

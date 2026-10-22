@@ -124,6 +124,15 @@ struct SettingsView: View {
                 }
             }
             .accessibilityLabel("Appearance")
+
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Accent color")
+                AccentColorPicker(settings: settings)
+                Text("Used for progress, selected chips, and play controls. The Home Screen widget follows.")
+                    .font(.footnote)
+                    .foregroundStyle(Theme.textSecondary)
+            }
+
             Toggle("Hide remaining time", isOn: Binding(
                 get: { settings.hideRemainingTime },
                 set: { settings.hideRemainingTime = $0 }
@@ -196,6 +205,64 @@ struct SettingsView: View {
             }
             .accessibilityLabel("Support")
         }
+    }
+}
+
+private struct AccentColorPicker: View {
+    var settings: SettingsStore
+
+    var body: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 10) {
+                ForEach(AccentSwatch.allCases) { swatch in
+                    let selected = settings.matchesAccent(swatch)
+                    Button {
+                        settings.applyAccent(swatch)
+                    } label: {
+                        Circle()
+                            .fill(Color(
+                                .displayP3,
+                                red: swatch.components.red,
+                                green: swatch.components.green,
+                                blue: swatch.components.blue,
+                                opacity: 1
+                            ))
+                            .frame(width: 32, height: 32)
+                            .overlay {
+                                if selected {
+                                    Image(systemName: "checkmark")
+                                        .font(.caption.weight(.bold))
+                                        .foregroundStyle(.white)
+                                        .shadow(color: .black.opacity(0.35), radius: 1, y: 0.5)
+                                }
+                            }
+                            .overlay {
+                                Circle()
+                                    .strokeBorder(Theme.hairline, lineWidth: 1)
+                            }
+                            .frame(width: 44, height: 44)
+                            .contentShape(Circle())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(swatch.label)
+                    .accessibilityAddTraits(selected ? .isSelected : [])
+                }
+
+                ColorPicker(
+                    "Custom accent color",
+                    selection: Binding(
+                        get: { settings.accentColor },
+                        set: { settings.applyAccent($0) }
+                    ),
+                    supportsOpacity: false
+                )
+                .labelsHidden()
+                .frame(width: 44, height: 44)
+                .accessibilityLabel("Custom accent color")
+            }
+            .padding(.vertical, 2)
+        }
+        .accessibilityElement(children: .contain)
     }
 }
 

@@ -11,11 +11,11 @@ Build number source of truth: Xcode CURRENT_PROJECT_VERSION (integer, monotonic)
 ## Current
 
 - Marketing: 1.4.1
-- Build: 7
+- Build: 8
 - Channel: App Store prep
-- Date: 2026-10-07
-- Git: fix/app-review-sample-1.4.1 (bnb549/Chapterline)
-- App, share extension, and widget all ship as 1.4.1 (7)
+- Date: 2026-10-13
+- Git: main (bnb549/Chapterline)
+- App, share extension, and widget all ship as 1.4.1 (8)
 
 ## SemVer rules
 
@@ -25,6 +25,12 @@ Build number source of truth: Xcode CURRENT_PROJECT_VERSION (integer, monotonic)
 - Build number: increment on every archive / TestFlight upload, even if marketing version is unchanged
 
 ## History
+
+### 1.4.1 — 2026-10-13 — build 8
+
+- PATCH. Home Screen widget shows the book cover (or a monogram), a thin progress bar, and a tighter small and medium layout. Play/pause still uses `chapterline://toggle`.
+- The app writes a downsampled `cover.jpg` into the App Group when the loaded book or artwork changes, and removes it when no book is loaded.
+- Files touched: `ChapterlineWidget.swift`, `PlayerController.swift`, `project.pbxproj`, `CHANGELOG.md`, `VERSION.md`.
 
 ### 1.4.1 — 2026-10-07 — build 7
 

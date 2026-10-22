@@ -1,9 +1,14 @@
 import Foundation
 import SwiftUI
+import UIKit
+import WidgetKit
 
 @Observable
 final class SettingsStore {
     static let shared = SettingsStore()
+
+    /// App Group key so the Home Screen widget can read the same accent.
+    static let accentRGBAppGroupKey = "settings.accentRGB"
 
     private let defaults: UserDefaults
 
@@ -28,6 +33,10 @@ final class SettingsStore {
     var appearance: AppearanceMode {
         didSet { defaults.set(appearance.rawValue, forKey: Key.appearance) }
     }
+    /// Display P3 components for the app accent. Changing these updates tint and the widget.
+    private(set) var accentRed: Double
+    private(set) var accentGreen: Double
+    private(set) var accentBlue: Double
     var hideRemainingTime: Bool {
         didSet { defaults.set(hideRemainingTime, forKey: Key.hideRemaining) }
     }
@@ -62,12 +71,23 @@ final class SettingsStore {
         if storedAppearance == "dim" {
             defaults.set(AppearanceMode.dark.rawValue, forKey: Key.appearance)
         }
+        let fallback = AccentSwatch.default.components
+        if let stored = defaults.array(forKey: Key.accentRGB) as? [Double], stored.count == 3 {
+            accentRed = Self.clampedComponent(stored[0])
+            accentGreen = Self.clampedComponent(stored[1])
+            accentBlue = Self.clampedComponent(stored[2])
+        } else {
+            accentRed = fallback.red
+            accentGreen = fallback.green
+            accentBlue = fallback.blue
+        }
         hideRemainingTime = defaults.bool(forKey: Key.hideRemaining)
         allowBookScrubbing = defaults.object(forKey: Key.allowBookScrubbing) as? Bool ?? true
         libraryLayout = LibraryLayout(rawValue: defaults.string(forKey: Key.layout) ?? "grid") ?? .grid
         librarySort = LibrarySort(rawValue: defaults.string(forKey: Key.sort) ?? "recent") ?? .recent
         shakeToExtendSleep = defaults.object(forKey: Key.shakeExtend) as? Bool ?? true
         trackListeningStats = defaults.object(forKey: Key.trackListeningStats) as? Bool ?? true
+        syncAccentToAppGroup(reloadWidget: false)
     }
 
     var preferredColorScheme: ColorScheme? {
@@ -80,6 +100,70 @@ final class SettingsStore {
 
     var usesTrueBlack: Bool { appearance.usesTrueBlack }
 
+    var accentColor: Color {
+        Color(.displayP3, red: accentRed, green: accentGreen, blue: accentBlue, opacity: 1)
+    }
+
+    func applyAccent(_ swatch: AccentSwatch) {
+        let c = swatch.components
+        setAccentComponents(red: c.red, green: c.green, blue: c.blue)
+    }
+
+    func applyAccent(_ color: Color) {
+        let c = Self.displayP3Components(from: color)
+        setAccentComponents(red: c.red, green: c.green, blue: c.blue)
+    }
+
+    func matchesAccent(_ swatch: AccentSwatch) -> Bool {
+        let c = swatch.components
+        return abs(accentRed - c.red) < 0.02
+            && abs(accentGreen - c.green) < 0.02
+            && abs(accentBlue - c.blue) < 0.02
+    }
+
+    private func setAccentComponents(red: Double, green: Double, blue: Double) {
+        let r = Self.clampedComponent(red)
+        let g = Self.clampedComponent(green)
+        let b = Self.clampedComponent(blue)
+        guard accentRed != r || accentGreen != g || accentBlue != b else { return }
+        accentRed = r
+        accentGreen = g
+        accentBlue = b
+        defaults.set([r, g, b], forKey: Key.accentRGB)
+        syncAccentToAppGroup(reloadWidget: true)
+    }
+
+    private func syncAccentToAppGroup(reloadWidget: Bool) {
+        guard let suite = UserDefaults(suiteName: AppGroup.identifier) else { return }
+        suite.set([accentRed, accentGreen, accentBlue], forKey: Self.accentRGBAppGroupKey)
+        guard reloadWidget else { return }
+        WidgetCenter.shared.reloadTimelines(ofKind: "ChapterlineWidget")
+    }
+
+    private static func clampedComponent(_ value: Double) -> Double {
+        min(1, max(0, value))
+    }
+
+    private static func displayP3Components(from color: Color) -> (red: Double, green: Double, blue: Double) {
+        let ui = UIColor(color)
+        if let space = CGColorSpace(name: CGColorSpace.displayP3),
+           let converted = ui.cgColor.converted(to: space, intent: .defaultIntent, options: nil),
+           let components = converted.components,
+           components.count >= 3 {
+            return (
+                clampedComponent(Double(components[0])),
+                clampedComponent(Double(components[1])),
+                clampedComponent(Double(components[2]))
+            )
+        }
+        var r: CGFloat = 0
+        var g: CGFloat = 0
+        var b: CGFloat = 0
+        var a: CGFloat = 0
+        ui.getRed(&r, green: &g, blue: &b, alpha: &a)
+        return (clampedComponent(Double(r)), clampedComponent(Double(g)), clampedComponent(Double(b)))
+    }
+
     private enum Key {
         static let skipBack = "settings.skipBack"
         static let skipForward = "settings.skipForward"
@@ -88,6 +172,7 @@ final class SettingsStore {
         static let sleepFade = "settings.sleepFade"
         static let boost = "settings.boost"
         static let appearance = "settings.appearance"
+        static let accentRGB = "settings.accentRGB"
         static let hideRemaining = "settings.hideRemaining"
         static let allowBookScrubbing = "settings.allowBookScrubbing"
         static let layout = "settings.layout"

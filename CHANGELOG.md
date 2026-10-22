@@ -5,14 +5,29 @@ All notable changes to Chapterline are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions follow the marketing labels used in recent commits (`v1.1`, `v1.2`, `v1.3`).
 
+## [Unreleased]
+
+### Added
+
+* Settings → Appearance includes accent color swatches and a custom color picker. Progress, selected chips, play controls, and the Home Screen widget follow the chosen color.
+
 ## [1.4.1] — 2026-10-07
+
+### Added
+
+* The Home Screen widget shows the current book's cover. A book with no artwork shows a monogram. The app writes a small JPEG into the App Group when the loaded book or its artwork changes, and removes it when nothing is loaded.
+
+### Changed
+
+* Small and medium widgets use a tighter layout: cover, title, chapter, a thin progress bar, and the play/pause control. Medium also shows the author. Play/pause still uses `chapterline://toggle`.
+* Long titles scale down, then truncate with an ellipsis.
+* The widget gallery description matches the widget: cover, progress, title, chapter, and play/pause.
 
 ### Fixed
 
 * An empty library has an Add sample button that copies a bundled public-domain reading of “The Raven” through the existing import path, so review can play a book with no account and no network.
 * The share extension opens only for m4b, m4a, mp3, aac, flac, and zip. A photo or PDF does not offer Chapterline, and unrecognized bytes are not saved as a book.
 * Document types use handler rank Alternate and no longer claim `public.audio`.
-* The widget gallery description matches the widget: title, chapter, author, and play/pause.
 
 ## [1.4.0] — 2026-10-07
 

@@ -28,7 +28,7 @@ struct RootView: View {
                 .nowPlayingBar(visible: showsNowPlayingBar(playerPushed: false), onOpen: presentNowPlaying)
                 .tabItem { Label("Settings", systemImage: "gearshape") }
         }
-        .tint(Color.accentColor)
+        .tint(settings.accentColor)
         .environment(\.nowPlayingClearance, nowPlayingBarHeight)
         .onPreferenceChange(NowPlayingBarHeightKey.self) { nowPlayingBarHeight = $0 }
         .preferredColorScheme(settings.preferredColorScheme)
